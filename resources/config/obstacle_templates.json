@@ -1,0 +1,488 @@
+{
+  "ground": {
+    "type": "ground",
+    "display_name": "ground",
+    "atlas_id": 0,
+    "atlas_coords": {
+      "x": 0,
+      "y": 0
+    },
+    "move_cost": 1,
+    "stops_projectile": false,
+    "intrinsic_height": 0,
+    "unit_stands_on_top": true,
+    "increment_terrain_height": false,
+    "decrement_terrain_height": false,
+    "continue_terrain_height": false,
+    "is_destructible": false,
+    "max_health": 0
+  },
+  "tree1": {
+    "type": "tree1",
+    "display_name": "tree",
+    "atlas_id": 0,
+    "atlas_coords": {
+      "x": 0,
+      "y": 1
+    },
+    "move_cost": 1,
+    "stops_projectile": false,
+    "intrinsic_height": 0,
+    "unit_stands_on_top": false,
+    "increment_terrain_height": false,
+    "decrement_terrain_height": false,
+    "continue_terrain_height": false,
+    "is_destructible": true,
+    "max_health": 150
+  },
+  "tree2": {
+    "type": "tree2",
+    "display_name": "tree",
+    "atlas_id": 0,
+    "atlas_coords": {
+      "x": 1,
+      "y": 1
+    },
+    "move_cost": 1,
+    "stops_projectile": false,
+    "intrinsic_height": 0,
+    "unit_stands_on_top": false,
+    "increment_terrain_height": false,
+    "decrement_terrain_height": false,
+    "continue_terrain_height": false,
+    "is_destructible": true,
+    "max_health": 150
+  },
+  "plant1": {
+    "type": "plant1",
+    "display_name": "plant",
+    "atlas_id": 0,
+    "atlas_coords": {
+      "x": 2,
+      "y": 1
+    },
+    "move_cost": 1,
+    "stops_projectile": false,
+    "intrinsic_height": 0,
+    "unit_stands_on_top": false,
+    "increment_terrain_height": false,
+    "decrement_terrain_height": false,
+    "continue_terrain_height": false,
+    "is_destructible": true,
+    "max_health": 100
+  },
+  "plant2": {
+    "type": "plant2",
+    "display_name": "plant",
+    "atlas_id": 0,
+    "atlas_coords": {
+      "x": 3,
+      "y": 1
+    },
+    "move_cost": 1,
+    "stops_projectile": false,
+    "intrinsic_height": 0,
+    "unit_stands_on_top": false,
+    "increment_terrain_height": false,
+    "decrement_terrain_height": false,
+    "continue_terrain_height": false,
+    "is_destructible": true,
+    "max_health": 100
+  },
+  "plant3": {
+    "type": "plant3",
+    "display_name": "plant",
+    "atlas_id": 0,
+    "atlas_coords": {
+      "x": 4,
+      "y": 1
+    },
+    "move_cost": 1,
+    "stops_projectile": false,
+    "intrinsic_height": 0,
+    "unit_stands_on_top": false,
+    "increment_terrain_height": false,
+    "decrement_terrain_height": false,
+    "continue_terrain_height": false,
+    "is_destructible": true,
+    "max_health": 100
+  },
+  "water": {
+    "type": "water",
+    "display_name": "water",
+    "atlas_id": 0,
+    "atlas_coords": {
+      "x": 0,
+      "y": 3
+    },
+    "move_cost": 2,
+    "stops_projectile": false,
+    "intrinsic_height": 0,
+    "unit_stands_on_top": false,
+    "increment_terrain_height": false,
+    "decrement_terrain_height": false,
+    "continue_terrain_height": false,
+    "is_destructible": false,
+    "max_health": 0
+  },
+  "mud": {
+    "type": "mud",
+    "display_name": "mud",
+    "atlas_id": 0,
+    "atlas_coords": {
+      "x": 1,
+      "y": 3
+    },
+    "move_cost": 2,
+    "stops_projectile": false,
+    "intrinsic_height": 0,
+    "unit_stands_on_top": false,
+    "increment_terrain_height": false,
+    "decrement_terrain_height": false,
+    "continue_terrain_height": false,
+    "is_destructible": false,
+    "max_health": 0
+  },
+  "tall_grass": {
+    "type": "tall_grass",
+    "display_name": "tall grass",
+    "atlas_id": 0,
+    "atlas_coords": {
+      "x": 0,
+      "y": 5
+    },
+    "move_cost": 2,
+    "stops_projectile": false,
+    "intrinsic_height": 5,
+    "unit_stands_on_top": false,
+    "increment_terrain_height": false,
+    "decrement_terrain_height": false,
+    "continue_terrain_height": false,
+    "is_destructible": true,
+    "max_health": 100
+  },
+  "cliff_horizontal_top_open": {
+    "type": "cliff_horizontal_top_open",
+    "display_name": "cliff",
+    "atlas_id": 0,
+    "atlas_coords": {
+      "x": 0,
+      "y": 7
+    },
+    "move_cost": 2,
+    "stops_projectile": true,
+    "intrinsic_height": 8,
+    "unit_stands_on_top": true,
+    "increment_terrain_height": false,
+    "decrement_terrain_height": false,
+    "continue_terrain_height": false,
+    "is_destructible": false,
+    "max_health": 0
+  },
+  "cliff_corner_top_left_open": {
+    "type": "cliff_corner_top_left_open",
+    "display_name": "cliff",
+    "atlas_id": 0,
+    "atlas_coords": {
+      "x": 2,
+      "y": 7
+    },
+    "move_cost": 2,
+    "stops_projectile": true,
+    "intrinsic_height": 8,
+    "unit_stands_on_top": true,
+    "increment_terrain_height": true,
+    "decrement_terrain_height": false,
+    "continue_terrain_height": true,
+    "is_destructible": false,
+    "max_health": 0
+  },
+  "cliff_corner_top_right_open": {
+    "type": "cliff_corner_top_right_open",
+    "display_name": "cliff",
+    "atlas_id": 0,
+    "atlas_coords": {
+      "x": 4,
+      "y": 7
+    },
+    "move_cost": 2,
+    "stops_projectile": true,
+    "intrinsic_height": 8,
+    "unit_stands_on_top": true,
+    "increment_terrain_height": false,
+    "decrement_terrain_height": true,
+    "continue_terrain_height": true,
+    "is_destructible": false,
+    "max_health": 0
+  },
+  "cliff_vertical_left_open": {
+    "type": "cliff_vertical_left_open",
+    "display_name": "cliff",
+    "atlas_id": 0,
+    "atlas_coords": {
+      "x": 6,
+      "y": 7
+    },
+    "move_cost": 2,
+    "stops_projectile": true,
+    "intrinsic_height": 8,
+    "unit_stands_on_top": true,
+    "increment_terrain_height": true,
+    "decrement_terrain_height": false,
+    "continue_terrain_height": true,
+    "is_destructible": false,
+    "max_health": 0
+  },
+  "cliff_vertical_right_open": {
+    "type": "cliff_vertical_right_open",
+    "display_name": "cliff",
+    "atlas_id": 0,
+    "atlas_coords": {
+      "x": 8,
+      "y": 7
+    },
+    "move_cost": 2,
+    "stops_projectile": true,
+    "intrinsic_height": 8,
+    "unit_stands_on_top": true,
+    "increment_terrain_height": false,
+    "decrement_terrain_height": true,
+    "continue_terrain_height": true,
+    "is_destructible": false,
+    "max_health": 0
+  },
+  "cliff_corner_top_right_closed": {
+    "type": "cliff_corner_top_right_closed",
+    "display_name": "cliff",
+    "atlas_id": 0,
+    "atlas_coords": {
+      "x": 10,
+      "y": 7
+    },
+    "move_cost": 2,
+    "stops_projectile": true,
+    "intrinsic_height": 8,
+    "unit_stands_on_top": true,
+    "increment_terrain_height": false,
+    "decrement_terrain_height": true,
+    "continue_terrain_height": true,
+    "is_destructible": false,
+    "max_health": 0
+  },
+  "cliff_corner_top_left_closed": {
+    "type": "cliff_corner_top_left_closed",
+    "display_name": "cliff",
+    "atlas_id": 0,
+    "atlas_coords": {
+      "x": 12,
+      "y": 7
+    },
+    "move_cost": 2,
+    "stops_projectile": true,
+    "intrinsic_height": 8,
+    "unit_stands_on_top": true,
+    "increment_terrain_height": true,
+    "decrement_terrain_height": false,
+    "continue_terrain_height": true,
+    "is_destructible": false,
+    "max_health": 0
+  },
+  "cliff_single": {
+    "type": "cliff_single",
+    "display_name": "cliff",
+    "atlas_id": 0,
+    "atlas_coords": {
+      "x": 14,
+      "y": 7
+    },
+    "move_cost": 2,
+    "stops_projectile": true,
+    "intrinsic_height": 8,
+    "unit_stands_on_top": true,
+    "increment_terrain_height": true,
+    "decrement_terrain_height": false,
+    "continue_terrain_height": false,
+    "is_destructible": false,
+    "max_health": 0
+  },
+  "cliff_end_left": {
+    "type": "cliff_end_left",
+    "display_name": "cliff",
+    "atlas_id": 0,
+    "atlas_coords": {
+      "x": 16,
+      "y": 7
+    },
+    "move_cost": 2,
+    "stops_projectile": true,
+    "intrinsic_height": 8,
+    "unit_stands_on_top": true,
+    "increment_terrain_height": true,
+    "decrement_terrain_height": false,
+    "continue_terrain_height": true,
+    "is_destructible": false,
+    "max_health": 0
+  },
+  "cliff_end_right": {
+    "type": "cliff_end_right",
+    "display_name": "cliff",
+    "atlas_id": 0,
+    "atlas_coords": {
+      "x": 18,
+      "y": 7
+    },
+    "move_cost": 2,
+    "stops_projectile": true,
+    "intrinsic_height": 8,
+    "unit_stands_on_top": true,
+    "increment_terrain_height": false,
+    "decrement_terrain_height": true,
+    "continue_terrain_height": true,
+    "is_destructible": false,
+    "max_health": 0
+  },
+  "cliff_end_top": {
+    "type": "cliff_end_top",
+    "display_name": "cliff",
+    "atlas_id": 0,
+    "atlas_coords": {
+      "x": 0,
+      "y": 9
+    },
+    "move_cost": 2,
+    "stops_projectile": true,
+    "intrinsic_height": 8,
+    "unit_stands_on_top": true,
+    "increment_terrain_height": true,
+    "decrement_terrain_height": false,
+    "continue_terrain_height": false,
+    "is_destructible": false,
+    "max_health": 0
+  },
+  "cliff_vertical_left": {
+    "type": "cliff_vertical_left",
+    "display_name": "cliff",
+    "atlas_id": 0,
+    "atlas_coords": {
+      "x": 2,
+      "y": 9
+    },
+    "move_cost": 2,
+    "stops_projectile": true,
+    "intrinsic_height": 8,
+    "unit_stands_on_top": true,
+    "increment_terrain_height": true,
+    "decrement_terrain_height": false,
+    "continue_terrain_height": true,
+    "is_destructible": false,
+    "max_health": 0
+  },
+  "cliff_vertical_right": {
+    "type": "cliff_vertical_right",
+    "display_name": "cliff",
+    "atlas_id": 0,
+    "atlas_coords": {
+      "x": 4,
+      "y": 9
+    },
+    "move_cost": 2,
+    "stops_projectile": true,
+    "intrinsic_height": 8,
+    "unit_stands_on_top": true,
+    "increment_terrain_height": false,
+    "decrement_terrain_height": true,
+    "continue_terrain_height": true,
+    "is_destructible": false,
+    "max_health": 0
+  },
+  "cliff_corner_bottom_left": {
+    "type": "cliff_corner_bottom_left",
+    "display_name": "cliff",
+    "atlas_id": 0,
+    "atlas_coords": {
+      "x": 6,
+      "y": 9
+    },
+    "move_cost": 2,
+    "stops_projectile": true,
+    "intrinsic_height": 8,
+    "unit_stands_on_top": true,
+    "increment_terrain_height": true,
+    "decrement_terrain_height": false,
+    "continue_terrain_height": true,
+    "is_destructible": false,
+    "max_health": 0
+  },
+  "cliff_corner_bottom_right": {
+    "type": "cliff_corner_bottom_right",
+    "display_name": "cliff",
+    "atlas_id": 0,
+    "atlas_coords": {
+      "x": 8,
+      "y": 9
+    },
+    "move_cost": 2,
+    "stops_projectile": true,
+    "intrinsic_height": 8,
+    "unit_stands_on_top": true,
+    "increment_terrain_height": false,
+    "decrement_terrain_height": true,
+    "continue_terrain_height": true,
+    "is_destructible": false,
+    "max_health": 0
+  },
+  "cliff_end_bottom": {
+    "type": "cliff_end_bottom",
+    "display_name": "cliff",
+    "atlas_id": 0,
+    "atlas_coords": {
+      "x": 10,
+      "y": 9
+    },
+    "move_cost": 2,
+    "stops_projectile": true,
+    "intrinsic_height": 8,
+    "unit_stands_on_top": true,
+    "increment_terrain_height": true,
+    "decrement_terrain_height": false,
+    "continue_terrain_height": false,
+    "is_destructible": false,
+    "max_health": 0
+  },
+  "cliff_horizontal_closed": {
+    "type": "cliff_horizontal_closed",
+    "display_name": "cliff",
+    "atlas_id": 0,
+    "atlas_coords": {
+      "x": 12,
+      "y": 9
+    },
+    "move_cost": 2,
+    "stops_projectile": true,
+    "intrinsic_height": 8,
+    "unit_stands_on_top": true,
+    "increment_terrain_height": false,
+    "decrement_terrain_height": false,
+    "continue_terrain_height": false,
+    "is_destructible": false,
+    "max_health": 0
+  },
+  "cliff_horizontal_open": {
+    "type": "cliff_horizontal_open",
+    "display_name": "cliff",
+    "atlas_id": 0,
+    "atlas_coords": {
+      "x": 14,
+      "y": 9
+    },
+    "move_cost": 2,
+    "stops_projectile": true,
+    "intrinsic_height": 8,
+    "unit_stands_on_top": true,
+    "increment_terrain_height": false,
+    "decrement_terrain_height": false,
+    "continue_terrain_height": false,
+    "is_destructible": false,
+    "max_health": 0
+  }
+}

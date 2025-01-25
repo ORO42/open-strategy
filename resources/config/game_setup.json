@@ -1,0 +1,17 @@
+{
+  "cell_config": {
+    "cell_width": 32,
+    "cell_height": 32,
+    "default_cell_atlas_id": 0,
+    "default_cell_atlas_coords": {
+      "x": 0,
+      "y": 0
+    },
+    "cliff_intrinsic_height": 8
+  },
+  "mode_config": {
+    "selected_map": "dev_map.json",
+    "load_save": "",
+    "connect_to": ""
+  }
+}
