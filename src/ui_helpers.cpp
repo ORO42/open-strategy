@@ -60,6 +60,8 @@ void sDrawGameTextures(GameContext *gameContext)
     }
 
     // Draw trapezoids after units and obstacles
+    // TODO: decouple trapezoids from view culling / check trap viewport collision (should draw unit trapezoid even if its parent unit isn't in viewport)
+    // TODO: either consolidate this into the unit drawing step to avoid the extra iteration, or move this block into its own function to separate concerns
     for (auto &cellIdx : cellIdxsInView)
     {
         if (gameContext->allUnits.find(cellIdx) != gameContext->allUnits.end())
@@ -263,8 +265,9 @@ void sDrawHoveredCellInfo(GameContext *gameContext)
 
     std::string cellInfo = gameContext->currentMap + " : " + "(" + std::to_string(mousePosCellIdx.x) + ", " + std::to_string(mousePosCellIdx.y) + ")";
     cellInfo += " : Level: " + std::to_string(cellSummary.terrainLevel) + " ";
-    cellInfo += std::to_string(cellSummary.totalObstacleHeight) + "ft; ";
-    cellInfo += std::to_string(cellSummary.totalHeight) + "ft; ";
+    cellInfo += "Total obstacle elev: " + std::to_string(cellSummary.totalHeightIncludingTopMostObstacleExcludingUnit) + "ft; ";
+    cellInfo += "Total unit elev: " + std::to_string(cellSummary.totalHeightofUnit) + "ft; ";
+    cellInfo += "Total elev " + std::to_string(cellSummary.totalHeightForCellIdx) + "ft; ";
     if (cellSummary.obstacle != entt::null)
     {
         auto &obstacleComp = gameContext->registry.get<Obstacle>(cellSummary.obstacle);
@@ -327,7 +330,8 @@ void sDrawSelectedUnitAbilities(GameContext *gameContext)
                 if (doUnderline)
                 {
                     DrawLine(textPos.x, textPos.y + gameContext->baseFontSize, textPos.x + textWidth, textPos.y + gameContext->baseFontSize, RED);
-                    DrawText(ability.description.c_str(), textPos.x + textWidth + 10.0f, textPos.y, gameContext->baseFontSize, LIGHTGRAY);
+                    DrawText(ability.description.c_str(), textPos.x + textWidth + 50.0f, textPos.y, gameContext->baseFontSize, LIGHTGRAY);
+                    DrawLine(textPos.x + textWidth + 5.0f, textPos.y + (gameContext->baseFontSize / 2), textPos.x + textWidth + 45.0f, textPos.y + (gameContext->baseFontSize / 2), LIGHTGRAY);
                 }
 
                 i++; // Move to the next line for the next ability
