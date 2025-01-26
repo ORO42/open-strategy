@@ -165,7 +165,7 @@ void sMoveUnits(GameContext *gameContext)
             // remove the first move cell idx
             movePointsComp.moveCellIdxs.erase(movePointsComp.moveCellIdxs.begin());
 
-            // Update unit trap positions
+            // Update unit vision trapezoid positions
             PositionAllTrapezoids(gameContext);
 
             if (movePointsComp.moveCellIdxs.size() == 0)
