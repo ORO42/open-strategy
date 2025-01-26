@@ -166,12 +166,14 @@ int GetTotalHeightIncludingTopMostObstacleExcludingUnitForCellIdx(GameContext *g
     {
         return terrainHeight;
     }
-    return (std::max(0, terrainLevel - 1) * gameContext->cliffIntrinsicHeight) + GetTopMostObstacleIntrinsicHeightForCellIdx(gameContext, cellIdx);
+
+    // If there is an obstacle other than cliff or wall
+    return terrainHeight + GetTopMostObstacleIntrinsicHeightForCellIdx(gameContext, cellIdx);
 }
 
 int GetTotalHeightOfUnitForCellIdx(GameContext *gameContext, const Vector2i &cellIdx)
 {
-    if (!CheckMouseInMapBounds(gameContext))
+    if (!CheckMouseInMapBounds(gameContext) || gameContext->allUnits.find(cellIdx) == gameContext->allUnits.end())
     {
         return 0;
     }
@@ -196,49 +198,21 @@ int GetTotalHeightForCellIdx(GameContext *gameContext, const Vector2i &cellIdx)
         return 0;
     }
 
-    // Get terrain height
-    int terrainHeight = GetTerrainHeightForCellIdx(gameContext, cellIdx);
+    int finalHeight;
 
-    // Initialize obstacle and unit heights
-    int obstacleHeight = 0;
-    int unitHeight = 0;
+    // if (gameContext->allObstacles.find(cellIdx) != gameContext->allObstacles.end())
+    // {
+    //     entt::entity obstacleEntity = gameContext->allObstacles[cellIdx];
+    //     auto &obstacleComp = gameContext->registry.get<Obstacle>(obstacleEntity);
+    // }
 
-    // Check for obstacle at cellIdx
-    if (gameContext->allObstacles.find(cellIdx) != gameContext->allObstacles.end())
-    {
-        entt::entity obstacleEntity = gameContext->allObstacles[cellIdx];
-        auto &obstacleComp = gameContext->registry.get<Obstacle>(obstacleEntity);
+    // if (gameContext->allUnits.find(cellIdx) != gameContext->allUnits.end())
+    // {
+    //     entt::entity unitEntity = gameContext->allUnits[cellIdx];
+    //     auto &unitcomp = gameContext->registry.get<Obstacle>(unitEntity);
+    // }
 
-        // If obstacle is a cliff or wall, terrainHeight should take precedence
-        if (obstacleComp.displayName == "cliff" || obstacleComp.displayName == "wall")
-        {
-            obstacleHeight = terrainHeight; // Terrain height as obstacle height
-        }
-        else
-        {
-            obstacleHeight = GetTopMostObstacleIntrinsicHeightForCellIdx(gameContext, cellIdx);
-        }
-
-        // Add unit height if unit stands on top of the obstacle
-        if (obstacleComp.unitStandsOnTop)
-        {
-            unitHeight = GetUnitIntrinsicHeightForCellIdx(gameContext, cellIdx);
-        }
-
-        // If terrainLevel is 0 and an obstacle exists, ignore terrain height
-        if (gameContext->terrainLevels[cellIdx] == 0)
-        {
-            terrainHeight = 0;
-        }
-    }
-    else
-    {
-        // No obstacle; only consider unit height
-        unitHeight = GetUnitIntrinsicHeightForCellIdx(gameContext, cellIdx);
-    }
-
-    // Total height is terrain + obstacle + unit
-    return terrainHeight + obstacleHeight + unitHeight;
+    return GetTotalHeightOfUnitForCellIdx(gameContext, cellIdx) + GetTotalHeightIncludingTopMostObstacleExcludingUnitForCellIdx(gameContext, cellIdx);
 }
 
 CellSummary GetCellSummary(GameContext *gameContext, const Vector2i &cellIdx)
