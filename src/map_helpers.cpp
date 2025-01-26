@@ -88,60 +88,6 @@ void Startup(GameContext *gameContext)
     std::cout << "All game setup config options are empty. Aborting game startup." << std::endl;
 }
 
-CellSummary GetCellSummary(GameContext *gameContext, Vector2i cellIdx)
-{
-    CellSummary cellSummary;
-
-    cellSummary.terrainLevel = gameContext->terrainLevels[cellIdx];
-
-    if (gameContext->allUnits.find(cellIdx) != gameContext->allUnits.end())
-    {
-        entt::entity unitEntity = gameContext->allUnits[cellIdx];
-        auto &unitComp = gameContext->registry.get<Unit>(unitEntity);
-
-        cellSummary.unit = unitEntity;
-
-        if (unitComp.stopsProjectile)
-        {
-            cellSummary.unitStopsProjectile = true;
-        }
-
-        if (unitComp.stance == Stances::STANDING || unitComp.stance == Stances::NONE)
-        {
-            cellSummary.unitHeight = unitComp.intrinsicHeight;
-        }
-        else if (unitComp.stance == Stances::CROUCHED)
-        {
-            cellSummary.unitHeight = unitComp.crouchHeight;
-        }
-        else if (unitComp.stance == Stances::PRONE)
-        {
-            cellSummary.unitHeight = unitComp.proneHeight;
-        }
-    }
-
-    if (gameContext->allObstacles.find(cellIdx) != gameContext->allObstacles.end())
-    {
-        entt::entity obstacleEntity = gameContext->allObstacles[cellIdx];
-        auto &obstacleComp = gameContext->registry.get<Obstacle>(obstacleEntity);
-
-        cellSummary.obstacle = obstacleEntity;
-
-        if (obstacleComp.stopsProjectile)
-        {
-            cellSummary.obstacleStopsProjectile = true;
-        }
-
-        cellSummary.obstacleHeight = obstacleComp.intrinsicHeight;
-
-        cellSummary.totalObstacleHeight = (cellSummary.terrainLevel * gameContext->cliffIntrinsicHeight) + obstacleComp.intrinsicHeight;
-    }
-
-    cellSummary.totalHeight = cellSummary.totalObstacleHeight + cellSummary.unitHeight;
-
-    return cellSummary;
-}
-
 ////////////////////////////////
 // Extrusion-based Line-of-Sight
 ////////////////////////////////
@@ -164,7 +110,7 @@ int GetTerrainHeightForCellIdx(GameContext *gameContext, const Vector2i &cellIdx
     return gameContext->terrainLevels[cellIdx] * gameContext->cliffIntrinsicHeight;
 }
 
-int GetUnitHeightForCellIdx(GameContext *gameContext, const Vector2i &cellIdx)
+int GetUnitIntrinsicHeightForCellIdx(GameContext *gameContext, const Vector2i &cellIdx)
 {
     if (!CheckMouseInMapBounds(gameContext) || gameContext->allUnits.find(cellIdx) == gameContext->allUnits.end())
     {
@@ -192,7 +138,7 @@ int GetUnitHeightForCellIdx(GameContext *gameContext, const Vector2i &cellIdx)
     }
 }
 
-int GetTopMostObstacleHeightForCellIdx(GameContext *gameContext, const Vector2i &cellIdx)
+int GetTopMostObstacleIntrinsicHeightForCellIdx(GameContext *gameContext, const Vector2i &cellIdx)
 {
     if (!CheckMouseInMapBounds(gameContext) || gameContext->allObstacles.find(cellIdx) == gameContext->allObstacles.end())
     {
@@ -200,7 +146,7 @@ int GetTopMostObstacleHeightForCellIdx(GameContext *gameContext, const Vector2i 
     }
 
     entt::entity obstacleEntity = gameContext->allObstacles[cellIdx];
-    auto &obstacleComp = gameContext->registry.get<Unit>(obstacleEntity);
+    auto &obstacleComp = gameContext->registry.get<Obstacle>(obstacleEntity);
     return obstacleComp.intrinsicHeight;
 }
 
@@ -211,27 +157,107 @@ int GetTotalHeightIncludingTopMostObstacleExcludingUnitForCellIdx(GameContext *g
         return 0;
     }
 
-    int terrainHeight = GetTerrainHeightForCellIdx(gameContext, cellIdx);
-
     entt::entity obstacleEntity = gameContext->allObstacles[cellIdx];
     auto &obstacleComp = gameContext->registry.get<Obstacle>(obstacleEntity);
-    return ((std::max(0, terrainHeight - 1) * gameContext->cliffIntrinsicHeight) + GetTopMostObstacleHeightForCellIdx(gameContext, cellIdx));
+
+    int terrainLevel = GetTerrainLevelForCellIdx(gameContext, cellIdx);
+    int terrainHeight = GetTerrainHeightForCellIdx(gameContext, cellIdx);
+    if (obstacleComp.displayName == "cliff" || obstacleComp.displayName == "wall")
+    {
+        return terrainHeight;
+    }
+    return (std::max(0, terrainLevel - 1) * gameContext->cliffIntrinsicHeight) + GetTopMostObstacleIntrinsicHeightForCellIdx(gameContext, cellIdx);
 }
 
-// int GetTotalHeightOfUnitForCellIdx(GameContext *gameContext, const Vector2i &cellIdx)
-// {
-//     if (!CheckMouseInMapBounds(gameContext))
-//     {
-//         return 0;
-//     }
+int GetTotalHeightOfUnitForCellIdx(GameContext *gameContext, const Vector2i &cellIdx)
+{
+    if (!CheckMouseInMapBounds(gameContext))
+    {
+        return 0;
+    }
 
-//     return
-// }
+    if (gameContext->allObstacles.find(cellIdx) != gameContext->allObstacles.end())
+    {
+        entt::entity obstacleEntity = gameContext->allObstacles[cellIdx];
+        auto &obstacleComp = gameContext->registry.get<Obstacle>(obstacleEntity);
+        if (obstacleComp.unitStandsOnTop)
+        {
+            return GetUnitIntrinsicHeightForCellIdx(gameContext, cellIdx) + GetTotalHeightIncludingTopMostObstacleExcludingUnitForCellIdx(gameContext, cellIdx);
+        }
+    }
+
+    return GetTerrainHeightForCellIdx(gameContext, cellIdx) + GetUnitIntrinsicHeightForCellIdx(gameContext, cellIdx);
+}
 
 int GetTotalHeightForCellIdx(GameContext *gameContext, const Vector2i &cellIdx)
 {
+    if (gameContext->allObstacles.find(cellIdx) != gameContext->allObstacles.end())
+    {
+        entt::entity obstacleEntity = gameContext->allObstacles[cellIdx];
+        auto &obstacleComp = gameContext->registry.get<Obstacle>(obstacleEntity);
+        if (obstacleComp.unitStandsOnTop)
+        {
+            return GetUnitIntrinsicHeightForCellIdx(gameContext, cellIdx) + GetTotalHeightIncludingTopMostObstacleExcludingUnitForCellIdx(gameContext, cellIdx);
+        }
+    }
+
+    if (gameContext->allUnits.find(cellIdx) != gameContext->allUnits.end())
+    {
+        entt::entity unitEntity = gameContext->allObstacles[cellIdx];
+        auto &unitComp = gameContext->registry.get<Unit>(unitEntity);
+        GetTotalHeightOfUnitForCellIdx(gameContext, cellIdx);
+    }
+
+    return 0;
 }
 
-Vector2i HasElevationLOS(const float &perCellWidthFeet, const Vector2i &observerCellIdx, const Vector2i &targetCellIdx, const Vector2i &betweenCellIdx)
+CellSummary GetCellSummary(GameContext *gameContext, const Vector2i &cellIdx)
 {
+    CellSummary cellSummary;
+
+    cellSummary.terrainLevel = GetTerrainLevelForCellIdx(gameContext, cellIdx);
+    cellSummary.terrainHeight = GetTerrainHeightForCellIdx(gameContext, cellIdx);
+    cellSummary.unitIntrinsicHeight = GetUnitIntrinsicHeightForCellIdx(gameContext, cellIdx);
+    cellSummary.topMostObstacleIntrinsicHeight = GetTopMostObstacleIntrinsicHeightForCellIdx(gameContext, cellIdx);
+    cellSummary.totalHeightIncludingTopMostObstacleExcludingUnit = GetTotalHeightIncludingTopMostObstacleExcludingUnitForCellIdx(gameContext, cellIdx);
+    cellSummary.totalHeightofUnit = GetTotalHeightOfUnitForCellIdx(gameContext, cellIdx);
+    cellSummary.totalHeightForCellIdx = GetTotalHeightForCellIdx(gameContext, cellIdx);
+
+    return cellSummary;
+}
+
+Vector2i HasElevationLOS(GameContext *gameContext, const float &perCellWidthFeet, const Vector2i &observerCellIdx, const Vector2i &targetCellIdx, const Vector2i &betweenCellIdx)
+{
+    int totalHeightAtObserver = GetTotalHeightForCellIdx(gameContext, observerCellIdx);
+    int totalHeightAtTarget = GetTotalHeightForCellIdx(gameContext, targetCellIdx);
+    int totalHeightAtBetweenCell = GetTotalHeightForCellIdx(gameContext, betweenCellIdx);
+
+    // Check if observer and target are adjacent
+    if (GetChebyshevDistance(observerCellIdx, targetCellIdx) == 1)
+    {
+        return Vector2i{-1, -1};
+    }
+
+    // Calculate the horizontal distance between observer and target
+    float horizontalDistance = std::sqrt(
+        std::pow((targetCellIdx.x - observerCellIdx.x) * perCellWidthFeet, 2) +
+        std::pow((targetCellIdx.y - observerCellIdx.y) * perCellWidthFeet, 2));
+
+    // Calculate the slope of the line of sight
+    float slope = (totalHeightAtTarget - totalHeightAtObserver) / horizontalDistance;
+
+    // Calculate the expected height at the betweenCellIdx based on the slope
+    float distanceToBetweenCell = std::sqrt(
+        std::pow((betweenCellIdx.x - observerCellIdx.x) * perCellWidthFeet, 2) +
+        std::pow((betweenCellIdx.y - observerCellIdx.y) * perCellWidthFeet, 2));
+    float expectedHeightAtBetweenCell = totalHeightAtObserver + slope * distanceToBetweenCell;
+
+    // Check if the betweenCellIdx height is above the expected height (blocking LOS)
+    if (totalHeightAtBetweenCell > expectedHeightAtBetweenCell)
+    {
+        return betweenCellIdx; // Blocking cell
+    }
+
+    // If the between cell is not blocking, return {-1, -1}
+    return Vector2i{-1, -1};
 }

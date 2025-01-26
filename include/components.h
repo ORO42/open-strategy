@@ -147,10 +147,12 @@ struct CellSummary
     bool obstacleStopsProjectile = false;
 
     int terrainLevel;
-    int unitHeight;
-    int obstacleHeight;
-    int totalObstacleHeight;
-    int totalHeight;
+    int terrainHeight;
+    int unitIntrinsicHeight;
+    int topMostObstacleIntrinsicHeight;
+    int totalHeightIncludingTopMostObstacleExcludingUnit;
+    int totalHeightofUnit;
+    int totalHeightForCellIdx;
 };
 
 struct PathSummary
