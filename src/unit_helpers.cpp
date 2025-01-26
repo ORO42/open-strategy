@@ -165,6 +165,9 @@ void sMoveUnits(GameContext *gameContext)
             // remove the first move cell idx
             movePointsComp.moveCellIdxs.erase(movePointsComp.moveCellIdxs.begin());
 
+            // Update unit trap positions
+            PositionAllTrapezoids(gameContext);
+
             if (movePointsComp.moveCellIdxs.size() == 0)
             {
                 gameContext->registry.remove<MovePoints>(unitEntity);
