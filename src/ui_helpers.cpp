@@ -265,8 +265,14 @@ void sDrawHoveredCellInfo(GameContext *gameContext)
 
     std::string cellInfo = gameContext->currentMap + " : " + "(" + std::to_string(mousePosCellIdx.x) + ", " + std::to_string(mousePosCellIdx.y) + ")";
     cellInfo += " : Level: " + std::to_string(cellSummary.terrainLevel) + " ";
-    cellInfo += "Total obstacle elev: " + std::to_string(cellSummary.totalHeightIncludingTopMostObstacleExcludingUnit) + "ft; ";
-    cellInfo += "Total unit elev: " + std::to_string(cellSummary.totalHeightofUnit) + "ft; ";
+    if (gameContext->allObstacles.find(mousePosCellIdx) != gameContext->allObstacles.end())
+    {
+        cellInfo += "Total obstacle elev: " + std::to_string(cellSummary.totalHeightIncludingTopMostObstacleExcludingUnit) + "ft; ";
+    }
+    if (gameContext->allUnits.find(mousePosCellIdx) != gameContext->allUnits.end())
+    {
+        cellInfo += "Total unit elev: " + std::to_string(cellSummary.totalHeightofUnit) + "ft; ";
+    }
     cellInfo += "Total elev " + std::to_string(cellSummary.totalHeightForCellIdx) + "ft; ";
     if (cellSummary.obstacle != entt::null)
     {
