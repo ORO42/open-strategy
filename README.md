@@ -2,6 +2,24 @@
 
 A cross-platform 2D turn-based strategy game
 
+## Features
+
+### Technical Features
+
+- P2P Multiplayer
+- Grid-based spatial culling
+- Sparse data storage
+- Supports very large maps with high performance
+- Composition pattern
+- Observer pattern
+- 3D projection collisions
+- 2D elevation-aware line-of-sight
+- Polygonal collisions
+- Polygon rotation
+- AABB collisions
+- Standalone map editor
+- Built-in mod support
+
 ## Supported Platforms
 
 Quickstart supports the main 3 desktop platforms:
