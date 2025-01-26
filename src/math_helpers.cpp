@@ -212,3 +212,52 @@ bool Chance(const double &probability)
     std::uniform_real_distribution<> distrib(0.0, 1.0);
     return distrib(gen) < probability;
 }
+
+Vector2 RotatePoint(Vector2 origin, Vector2 point, float angle)
+{
+    float rad = angle * (M_PI / 180.0f); // Convert to radians
+    float s = std::sin(rad);
+    float c = std::cos(rad);
+
+    // Translate point back to origin
+    point.x -= origin.x;
+    point.y -= origin.y;
+
+    // Rotate point
+    float xnew = point.x * c - point.y * s;
+    float ynew = point.x * s + point.y * c;
+
+    // Translate point back
+    point.x = xnew + origin.x;
+    point.y = ynew + origin.y;
+
+    return point;
+}
+
+float AngleDifference(float angle1, float angle2)
+{
+    float diff = std::fmod(angle2 - angle1, 360.0f);
+    if (diff < -180.0f)
+        diff += 360.0f;
+    else if (diff > 180.0f)
+        diff -= 360.0f;
+
+    return diff;
+}
+
+float GetAngleBetweenPoints(Vector2 p1, Vector2 p2)
+{
+    float deltaY = p2.y - p1.y;
+    float deltaX = p2.x - p1.x;
+    float angleInRadians = atan2(deltaY, deltaX);
+    float angleInDegrees = angleInRadians * (180.0f / M_PI); // Convert radians to degrees
+    return angleInDegrees;
+}
+
+void RotateTrapezoid(IsoscelesTrapezoid &trapezoid, float angle)
+{
+    trapezoid.p1 = RotatePoint(trapezoid.originPos, trapezoid.p1, angle);
+    trapezoid.p2 = RotatePoint(trapezoid.originPos, trapezoid.p2, angle);
+    trapezoid.p3 = RotatePoint(trapezoid.originPos, trapezoid.p3, angle);
+    trapezoid.p4 = RotatePoint(trapezoid.originPos, trapezoid.p4, angle);
+}

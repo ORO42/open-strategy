@@ -16,6 +16,10 @@ Circle GenerateGridBoundCircle(const Vector2 &centerPos, const int &gridRadius, 
 Rectangle GenerateCellNeighborRect(const Vector2i &centerCellIdx, const int &neighCt, const int &cellWidth, const int &cellHeight);
 std::vector<Vector2i> GetCellIdxsOverlappingCircle(const Circle &circle, const int &cellWidth, const int &cellHeight);
 bool Chance(const double &probability);
+Vector2 RotatePoint(Vector2 origin, Vector2 point, float angle);
+void RotateTrapezoid(IsoscelesTrapezoid &trapezoid, float angle);
+float AngleDifference(float angle1, float angle2);
+float GetAngleBetweenPoints(Vector2 p1, Vector2 p2);
 
 template <typename T>
 T GetRandomItemFromVector(const std::vector<T> &vec)

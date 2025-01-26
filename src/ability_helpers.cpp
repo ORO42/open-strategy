@@ -1,6 +1,7 @@
 #include "ability_helpers.h"
 #include "map_helpers.h"
 #include "math_helpers.h"
+#include "unit_helpers.h"
 
 void sCycleSelectedAbility(GameContext *gameContext)
 {
@@ -265,6 +266,16 @@ void sUseAbilities(GameContext *gameContext)
                     std::cout << selectedUnitComp.supplies << " " << currMoveCost << std::endl;
                     selectedUnitComp.supplies -= currMoveCost;
                 }
+            }
+        }
+        if (selectedUnitComp.selectedAbility->type == "rotate")
+        {
+            auto visionTrapEntity = gameContext->registry.try_get<IsoscelesTrapezoid>(selectedUnitEntity);
+            if (visionTrapEntity != nullptr)
+            {
+                auto &visionTrapezoidComp = gameContext->registry.get<IsoscelesTrapezoid>(selectedUnitEntity);
+                visionTrapEntity->facingAngle = GetAngleBetweenPoints(selectedUnitCenter, mouseRectCenter);
+                PositionAllTrapezoids(gameContext);
             }
         }
     }

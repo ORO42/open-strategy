@@ -18,6 +18,10 @@
     "max_health": 100,
     "max_supplies": 50,
     "stops_projectile": false,
+    "use_vision": true,
+    "vision_base_width": 1,
+    "vision_top_width": 4,
+    "vision_length": 10,
     "abilities": {
       "move": {
         "type": "move",

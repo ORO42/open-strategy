@@ -157,3 +157,18 @@ struct PathSummary
 {
     std::map<Vector2i, CellSummary> cellSummaries;
 };
+
+struct IsoscelesTrapezoid
+{
+    int baseWidth = 1;
+    int topWidth = 1;
+    int length = 1;
+
+    float facingAngle; // direction the top edge of the trapezoid is facing
+
+    Vector2 originPos; // center of base
+    Vector2 p1;        // base left
+    Vector2 p2;        // base right
+    Vector2 p3;        // top right
+    Vector2 p4;        // top left
+};

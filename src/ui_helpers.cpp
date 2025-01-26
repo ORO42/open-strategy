@@ -8,6 +8,8 @@ void sDrawGameTextures(GameContext *gameContext)
     std::vector<Vector2i> cellIdxsInView = DeduceCellIdxsOverlappingRect(viewportRect, gameContext->cellWidth, gameContext->cellHeight);
 
     BeginMode2D(gameContext->camera);
+
+    // Draw obstacles and units
     for (auto &cellIdx : cellIdxsInView)
     {
         if (gameContext->allObstacles.find(cellIdx) != gameContext->allObstacles.end())
@@ -56,6 +58,26 @@ void sDrawGameTextures(GameContext *gameContext)
             DrawTexturePro(gameContext->allTextures[spriteSheetName], sourceRect, destRect, {0.0f, 0.0f}, 0.0f, WHITE);
         }
     }
+
+    // Draw trapezoids after units and obstacles
+    for (auto &cellIdx : cellIdxsInView)
+    {
+        if (gameContext->allUnits.find(cellIdx) != gameContext->allUnits.end())
+        {
+            entt::entity unitEntity = gameContext->allUnits[cellIdx];
+            auto visionTrapEntity = gameContext->registry.try_get<IsoscelesTrapezoid>(unitEntity);
+            if (visionTrapEntity != nullptr)
+            {
+                auto &visionTrapezoidComp = gameContext->registry.get<IsoscelesTrapezoid>(unitEntity);
+                if (gameContext->registry.all_of<TeamRed>(unitEntity) && gameContext->myPlayer.team == Teams::TEAM_RED || gameContext->registry.all_of<TeamBlue>(unitEntity) && gameContext->myPlayer.team == Teams::TEAM_BLUE)
+                {
+                    DrawTriangle(visionTrapezoidComp.p1, visionTrapezoidComp.p2, visionTrapezoidComp.p3, Fade(WHITE, 0.1f));
+                    DrawTriangle(visionTrapezoidComp.p1, visionTrapezoidComp.p3, visionTrapezoidComp.p4, Fade(WHITE, 0.1f));
+                }
+            }
+        }
+    }
+
     EndMode2D();
 }
 

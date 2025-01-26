@@ -35,6 +35,31 @@ void CreateUnit(GameContext *gameContext, const std::string &type, const Vector2
         gameContext->registry.emplace<TeamRed>(unitEntity);
     }
 
+    if (gameContext->unitTemplates[type]["use_vision"])
+    {
+        Vector2 unitWorldPos = MapToWorld(cellIdx, gameContext->cellWidth, gameContext->cellHeight);
+        Vector2 unitCenter = GetRectCenter(Rectangle{unitWorldPos.x, unitWorldPos.y, static_cast<float>(gameContext->cellWidth), static_cast<float>(gameContext->cellHeight)});
+        int visionBaseWidth = gameContext->unitTemplates[type]["vision_base_width"];
+        int visionTopWidth = gameContext->unitTemplates[type]["vision_top_width"];
+        int visionLength = gameContext->unitTemplates[type]["vision_length"];
+        float cellWidthFloat = static_cast<float>(gameContext->cellWidth);
+        Vector2 origin = unitCenter;
+        Vector2 p1 = {origin.x - (visionBaseWidth / 2.0f) * cellWidthFloat, origin.y};
+        Vector2 p2 = {origin.x + (visionBaseWidth / 2.0f) * cellWidthFloat, origin.y};
+        Vector2 p3 = {origin.x + (visionTopWidth / 2.0f) * cellWidthFloat, origin.y - visionLength * cellWidthFloat};
+        Vector2 p4 = {origin.x - (visionTopWidth / 2.0f) * cellWidthFloat, origin.y - visionLength * cellWidthFloat};
+        gameContext->registry.emplace<IsoscelesTrapezoid>(unitEntity,
+                                                          visionBaseWidth,
+                                                          visionTopWidth,
+                                                          visionLength,
+                                                          -90.0f,
+                                                          origin,
+                                                          p1,
+                                                          p2,
+                                                          p3,
+                                                          p4);
+    }
+
     nlohmann::json unitAbilities = gameContext->unitTemplates[type]["abilities"];
     if (unitAbilities.size() > 0)
     {
@@ -145,5 +170,43 @@ void sMoveUnits(GameContext *gameContext)
                 gameContext->registry.remove<MovePoints>(unitEntity);
             }
         }
+    }
+}
+
+void PositionAllTrapezoids(GameContext *gameContext)
+{
+    auto view = gameContext->registry.view<Unit, IsoscelesTrapezoid>();
+    for (auto &entity : view)
+    {
+        auto &unitComp = gameContext->registry.get<Unit>(entity);
+        auto &visionTrapComp = gameContext->registry.get<IsoscelesTrapezoid>(entity);
+
+        float northAngle = -90.0f;
+
+        Vector2 unitWorldPos = MapToWorld(unitComp.cellIdx, gameContext->cellWidth, gameContext->cellHeight);
+        Vector2 unitCenter = GetRectCenter(Rectangle{unitWorldPos.x, unitWorldPos.y, static_cast<float>(gameContext->cellWidth), static_cast<float>(gameContext->cellHeight)});
+
+        float cellWidthFloat = static_cast<float>(gameContext->cellWidth);
+
+        int visionBaseWidth = visionTrapComp.baseWidth;
+        int visionTopWidth = visionTrapComp.topWidth;
+        int visionLength = visionTrapComp.length;
+
+        Vector2 origin = unitCenter;
+        Vector2 p1 = {origin.x - (visionBaseWidth / 2.0f) * cellWidthFloat, origin.y};
+        Vector2 p2 = {origin.x + (visionBaseWidth / 2.0f) * cellWidthFloat, origin.y};
+        Vector2 p3 = {origin.x + (visionTopWidth / 2.0f) * cellWidthFloat, origin.y - visionLength * cellWidthFloat};
+        Vector2 p4 = {origin.x - (visionTopWidth / 2.0f) * cellWidthFloat, origin.y - visionLength * cellWidthFloat};
+
+        IsoscelesTrapezoid tempTrap = IsoscelesTrapezoid{visionBaseWidth, visionTopWidth, visionLength, northAngle, origin, p1, p2, p3, p4};
+
+        float angleDelta = AngleDifference(northAngle, visionTrapComp.facingAngle);
+
+        RotateTrapezoid(tempTrap, angleDelta);
+        visionTrapComp.originPos = origin;
+        visionTrapComp.p1 = tempTrap.p1;
+        visionTrapComp.p2 = tempTrap.p2;
+        visionTrapComp.p3 = tempTrap.p3;
+        visionTrapComp.p4 = tempTrap.p4;
     }
 }
