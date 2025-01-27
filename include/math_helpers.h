@@ -20,6 +20,9 @@ Vector2 RotatePoint(Vector2 origin, Vector2 point, float angle);
 void RotateTrapezoid(IsoscelesTrapezoid &trapezoid, float angle);
 float AngleDifference(float angle1, float angle2);
 float GetAngleBetweenPoints(Vector2 p1, Vector2 p2);
+BoundingBox CreateGridCellBoundingBox(float x, float y, float width, float height, float boxHeight);
+Vector3 MyVector3Normalize(Vector3 v);
+Vector3 MyVector3Subtract(Vector3 v1, Vector3 v2);
 
 template <typename T>
 T GetRandomItemFromVector(const std::vector<T> &vec)

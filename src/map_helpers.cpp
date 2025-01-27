@@ -231,39 +231,102 @@ CellSummary GetCellSummary(GameContext *gameContext, const Vector2i &cellIdx)
     cellSummary.totalHeightofUnit = GetTotalHeightOfUnitForCellIdx(gameContext, cellIdx);
     cellSummary.totalHeightForCellIdx = GetTotalHeightForCellIdx(gameContext, cellIdx);
 
+    if (gameContext->allUnits.find(cellIdx) != gameContext->allUnits.end())
+    {
+        entt::entity unitEntity = gameContext->allUnits[cellIdx];
+        auto &unitcomp = gameContext->registry.get<Unit>(unitEntity);
+
+        cellSummary.unit = unitEntity;
+
+        if (unitcomp.stopsProjectile)
+        {
+            cellSummary.unitStopsProjectile = true;
+        }
+    }
+    if (gameContext->allObstacles.find(cellIdx) != gameContext->allObstacles.end())
+    {
+        entt::entity obstacleEntity = gameContext->allObstacles[cellIdx];
+        auto &obstacleComp = gameContext->registry.get<Obstacle>(obstacleEntity);
+
+        cellSummary.obstacle = obstacleEntity;
+
+        if (obstacleComp.stopsProjectile)
+        {
+            cellSummary.obstacleStopsProjectile = true;
+        }
+    }
+
     return cellSummary;
 }
 
+// Vector2i HasElevationLOS(GameContext *gameContext, const float &perCellWidthFeet, const Vector2i &observerCellIdx, const Vector2i &targetCellIdx, const Vector2i &betweenCellIdx)
+// {
+//     int totalHeightAtObserver = GetTotalHeightForCellIdx(gameContext, observerCellIdx);
+//     int totalHeightAtTarget = GetTotalHeightForCellIdx(gameContext, targetCellIdx);
+//     int totalHeightAtBetweenCell = GetTotalHeightForCellIdx(gameContext, betweenCellIdx);
+
+//     Vector2 tlCornerObserverRect2D = MapToWorld(observerCellIdx, gameContext->cellWidth, gameContext->cellHeight);
+//     Vector2 tlCornerBetweenRect2D = MapToWorld(betweenCellIdx, gameContext->cellWidth, gameContext->cellHeight);
+//     Vector2 tlCornerTargetRect2D = MapToWorld(targetCellIdx, gameContext->cellWidth, gameContext->cellHeight);
+
+//     // Check if observer and target are adjacent
+//     if (GetChebyshevDistance(observerCellIdx, targetCellIdx) == 1)
+//     {
+//         return Vector2i{-1, -1};
+//     }
+
+//     // TODO:
+//     // 1. Project total height at observer to a cube that is 3.28 feet wide and totalHeightAtObserver tall.
+//     // 2. Project total height at between cell to a cube that is 3.28 feet wide and totalHeightAtBetweenCell tall.
+//     // 3. Project total height at target to a cube that is 3.28 feet wide and totalHeightAtTarget tall.
+//     // 4. Create a 3d line raycast between the top of the observer cube and the top of the target cube
+//     // 5. If the 3d raycast intersects the between cube, return betweenCellIdx, else return {-1, -1}
+
+//     // If the between cell is not blocking, return {-1, -1}
+//     return Vector2i{-1, -1};
+// }
+
 Vector2i HasElevationLOS(GameContext *gameContext, const float &perCellWidthFeet, const Vector2i &observerCellIdx, const Vector2i &targetCellIdx, const Vector2i &betweenCellIdx)
 {
-    int totalHeightAtObserver = GetTotalHeightForCellIdx(gameContext, observerCellIdx);
-    int totalHeightAtTarget = GetTotalHeightForCellIdx(gameContext, targetCellIdx);
-    int totalHeightAtBetweenCell = GetTotalHeightForCellIdx(gameContext, betweenCellIdx);
-
     // Check if observer and target are adjacent
     if (GetChebyshevDistance(observerCellIdx, targetCellIdx) == 1)
     {
         return Vector2i{-1, -1};
     }
 
-    // Calculate the horizontal distance between observer and target
-    float horizontalDistance = std::sqrt(
-        std::pow((targetCellIdx.x - observerCellIdx.x) * perCellWidthFeet, 2) +
-        std::pow((targetCellIdx.y - observerCellIdx.y) * perCellWidthFeet, 2));
+    int totalHeightAtObserver = GetTotalHeightForCellIdx(gameContext, observerCellIdx);
+    int totalHeightAtTarget = GetTotalHeightForCellIdx(gameContext, targetCellIdx);
+    int totalHeightAtBetweenCell = GetTotalHeightForCellIdx(gameContext, betweenCellIdx);
 
-    // Calculate the slope of the line of sight
-    float slope = (totalHeightAtTarget - totalHeightAtObserver) / horizontalDistance;
+    Vector2 tlCornerObserverRect2D = MapToWorld(observerCellIdx, gameContext->cellWidth, gameContext->cellHeight);
+    Vector2 tlCornerBetweenRect2D = MapToWorld(betweenCellIdx, gameContext->cellWidth, gameContext->cellHeight);
+    Vector2 tlCornerTargetRect2D = MapToWorld(targetCellIdx, gameContext->cellWidth, gameContext->cellHeight);
 
-    // Calculate the expected height at the betweenCellIdx based on the slope
-    float distanceToBetweenCell = std::sqrt(
-        std::pow((betweenCellIdx.x - observerCellIdx.x) * perCellWidthFeet, 2) +
-        std::pow((betweenCellIdx.y - observerCellIdx.y) * perCellWidthFeet, 2));
-    float expectedHeightAtBetweenCell = totalHeightAtObserver + slope * distanceToBetweenCell;
+    // Project 2D cells to 3D cubes
+    BoundingBox observerBox = CreateGridCellBoundingBox(tlCornerObserverRect2D.x, tlCornerObserverRect2D.y, gameContext->cellWidth, gameContext->cellHeight, totalHeightAtObserver);
+    BoundingBox betweenBox = CreateGridCellBoundingBox(tlCornerBetweenRect2D.x, tlCornerBetweenRect2D.y, gameContext->cellWidth, gameContext->cellHeight, totalHeightAtBetweenCell);
+    BoundingBox targetBox = CreateGridCellBoundingBox(tlCornerTargetRect2D.x, tlCornerTargetRect2D.y, gameContext->cellWidth, gameContext->cellHeight, totalHeightAtTarget);
 
-    // Check if the betweenCellIdx height is above the expected height (blocking LOS)
-    if (totalHeightAtBetweenCell > expectedHeightAtBetweenCell)
+    // Cast ray from top center of observerBox to top center of targetBox
+    Vector3 observerTopCenter;
+    observerTopCenter.x = observerBox.min.x + (gameContext->cellWidth / 2);
+    observerTopCenter.y = observerBox.min.y + (gameContext->cellHeight / 2);
+    observerTopCenter.z = observerBox.max.z;
+
+    Vector3 targetTopCenter;
+    targetTopCenter.x = targetBox.min.x + (gameContext->cellWidth / 2);
+    targetTopCenter.y = targetBox.min.y + (gameContext->cellHeight / 2);
+    targetTopCenter.z = targetBox.max.z;
+
+    Ray ray;
+    ray.position = observerTopCenter;
+    ray.direction = MyVector3Normalize(MyVector3Subtract(targetTopCenter, observerTopCenter));
+
+    RayCollision collision = GetRayCollisionBox(ray, betweenBox);
+
+    if (collision.hit)
     {
-        return betweenCellIdx; // Blocking cell
+        return betweenCellIdx;
     }
 
     // If the between cell is not blocking, return {-1, -1}

@@ -261,3 +261,44 @@ void RotateTrapezoid(IsoscelesTrapezoid &trapezoid, float angle)
     trapezoid.p3 = RotatePoint(trapezoid.originPos, trapezoid.p3, angle);
     trapezoid.p4 = RotatePoint(trapezoid.originPos, trapezoid.p4, angle);
 }
+
+BoundingBox CreateGridCellBoundingBox(float x, float y, float width, float height, float boxHeight)
+{
+    BoundingBox box;
+
+    // Minimum corner (bottom-left, at z=0)
+    box.min.x = x;
+    box.min.y = y;
+    box.min.z = 0.0f; // Assuming the grid is at z = 0 in our 3d world
+
+    // Maximum corner (top-right, at z = boxHeight)
+    box.max.x = x + width;
+    box.max.y = y + height;
+    box.max.z = boxHeight;
+
+    return box;
+}
+
+Vector3 MyVector3Normalize(Vector3 v)
+{
+    Vector3 result = v;
+
+    float length = sqrtf(v.x * v.x + v.y * v.y + v.z * v.z);
+    if (length != 0.0f)
+    {
+        float ilength = 1.0f / length;
+
+        result.x *= ilength;
+        result.y *= ilength;
+        result.z *= ilength;
+    }
+
+    return result;
+}
+
+Vector3 MyVector3Subtract(Vector3 v1, Vector3 v2)
+{
+    Vector3 result = {v1.x - v2.x, v1.y - v2.y, v1.z - v2.z};
+
+    return result;
+}

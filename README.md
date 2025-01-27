@@ -12,8 +12,9 @@ A cross-platform 2D turn-based strategy game
 - Supports very large maps with high performance
 - Composition pattern
 - Observer pattern
+- Entity Component System
 - 3D projection collisions
-- 2D elevation-aware line-of-sight
+- Elevation-aware line-of-sight
 - Polygonal collisions
 - Polygon rotation
 - AABB collisions

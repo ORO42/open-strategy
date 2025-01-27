@@ -132,6 +132,7 @@ void sUseAbilities(GameContext *gameContext)
     int currMoveCost = 0;
     std::vector<Vector2i> finalMovePoints;
     std::vector<Vector2i> bresenhamCells;
+    // NOTE: Bresenham's is only used for the "move" ability
     if (selectedUnitComp.selectedAbility->doesBresenhamTargeting)
     {
         bresenhamCells = GetBresenhamCells(selectedUnitComp.cellIdx, mousePosCellIdx, gameContext->cellWidth, gameContext->cellHeight);
@@ -154,6 +155,7 @@ void sUseAbilities(GameContext *gameContext)
         }
     }
 
+    // Handle inaccuracyRadius
     Vector2i finalCellIdx = mousePosCellIdx;
     Vector2 finalCenter = mouseRectCenter;
     float accuracyP = 1.0;
@@ -178,7 +180,7 @@ void sUseAbilities(GameContext *gameContext)
 
     // TODO: Implement corner->corner casting for more forgiving LOS
     std::vector<Vector2i> straightLineCells;
-    bool isStraightLinePathBlocked = false;
+    Vector2i blockingCellIdx = {-1, -1};
     if (selectedUnitComp.selectedAbility->doesStraightLineTargeting)
     {
         straightLineCells = GetCellsOverlappingLine(selectedUnitCenter, finalCenter, gameContext->cellWidth, gameContext->cellHeight);
@@ -191,18 +193,19 @@ void sUseAbilities(GameContext *gameContext)
             {
                 auto &obstacleComp = gameContext->registry.get<Obstacle>(cellSummary.obstacle);
             }
-            // Vector2i blockingCellIdx = HasElevationLOS(3.28084, selectedUnitCellSummary.totalHeight, finalCellSummary.totalHeight, cellSummary.totalHeight, cell, selectedUnitComp.cellIdx, finalCellIdx);
-            // DrawRectangleRec({static_cast<float>(cell.x) * gameContext->cellWidth, static_cast<float>(cell.y) * gameContext->cellHeight, static_cast<float>(gameContext->cellWidth), static_cast<float>(gameContext->cellHeight)}, Fade(BLUE, 0.2f));
-            // std::cout << "Blocking cell: " << blockingCellIdx.x << ", " << blockingCellIdx.y << std::endl;
-            // if (blockingCellIdx.x != -1 && blockingCellIdx.y != -1)
-            // {
-            //     // There is a blocking cell
-            //     finalCellIdx = blockingCellIdx;
-            //     Vector2 finalCellIdxToWorld = MapToWorld(finalCellIdx, gameContext->cellWidth, gameContext->cellHeight);
-            //     finalCenter = GetRectCenter(Rectangle{finalCellIdxToWorld.x, finalCellIdxToWorld.y, static_cast<float>(gameContext->cellWidth), static_cast<float>(gameContext->cellHeight)});
-            //     Circle blockingIndicator = GenerateGridBoundCircle(finalCenter, 0, gameContext->cellWidth, gameContext->cellHeight);
-            //     DrawCircle(blockingIndicator.centerPos.x, blockingIndicator.centerPos.y, blockingIndicator.radius, BLACK);
-            // }
+            DrawRectangleRec({static_cast<float>(cell.x) * gameContext->cellWidth, static_cast<float>(cell.y) * gameContext->cellHeight, static_cast<float>(gameContext->cellWidth), static_cast<float>(gameContext->cellHeight)}, Fade(BLUE, 0.2f));
+
+            blockingCellIdx = HasElevationLOS(gameContext, 3.28f, selectedUnitComp.cellIdx, mousePosCellIdx, cell);
+            if (blockingCellIdx.x != -1 && blockingCellIdx.y != -1)
+            {
+                // There is a blocking cell
+                finalCellIdx = blockingCellIdx;
+                Vector2 finalCellIdxToWorld = MapToWorld(finalCellIdx, gameContext->cellWidth, gameContext->cellHeight);
+                finalCenter = GetRectCenter(Rectangle{finalCellIdxToWorld.x, finalCellIdxToWorld.y, static_cast<float>(gameContext->cellWidth), static_cast<float>(gameContext->cellHeight)});
+                Circle blockingIndicator = GenerateGridBoundCircle(finalCenter, 0, gameContext->cellWidth, gameContext->cellHeight);
+                DrawCircle(blockingIndicator.centerPos.x, blockingIndicator.centerPos.y, blockingIndicator.radius, BLACK);
+                break;
+            }
         }
     }
 
@@ -216,32 +219,20 @@ void sUseAbilities(GameContext *gameContext)
         }
     }
 
-    if (selectedUnitComp.selectedAbility->range > -1)
+    if (selectedUnitComp.selectedAbility->range > 0)
     {
-        // Circle rangeCircle = GenerateGridBoundCircle(selectedUnitCenter, selectedUnitComp.selectedAbility->range, gameContext->cellWidth, gameContext->cellHeight);
-        // DrawCircle(rangeCircle.centerPos.x, rangeCircle.centerPos.y, rangeCircle.radius, Fade(WHITE, 0.2f));
-        // DrawCircleLines(rangeCircle.centerPos.x, rangeCircle.centerPos.y, rangeCircle.radius, WHITE);
-
         Rectangle rect = GenerateCellNeighborRect(selectedUnitComp.cellIdx, selectedUnitComp.selectedAbility->range, gameContext->cellWidth, gameContext->cellHeight);
         DrawRectangleRec(rect, Fade(WHITE, 0.2f));
     }
 
-    if (selectedUnitComp.selectedAbility->aoeSize > -1)
+    if (selectedUnitComp.selectedAbility->aoeSize > 0)
     {
-        // Circle aoeCircle = GenerateGridBoundCircle(mouseRectCenter, selectedUnitComp.selectedAbility->aoeSize, gameContext->cellWidth, gameContext->cellHeight);
-        // DrawCircle(aoeCircle.centerPos.x, aoeCircle.centerPos.y, aoeCircle.radius, Fade(BLUE, 0.3f));
-        // DrawCircleLines(aoeCircle.centerPos.x, aoeCircle.centerPos.y, aoeCircle.radius, BLUE);
-
         Rectangle rect = GenerateCellNeighborRect(mousePosCellIdx, selectedUnitComp.selectedAbility->aoeSize, gameContext->cellWidth, gameContext->cellHeight);
         DrawRectangleRec(rect, Fade(WHITE, 0.2f));
     }
 
-    if (selectedUnitComp.selectedAbility->inaccuracyRadius > -1)
+    if (selectedUnitComp.selectedAbility->inaccuracyRadius > 0)
     {
-        // Circle inaccuracyCircle = GenerateGridBoundCircle(mouseRectCenter, selectedUnitComp.selectedAbility->inaccuracyRadius, gameContext->cellWidth, gameContext->cellHeight);
-        // DrawCircle(inaccuracyCircle.centerPos.x, inaccuracyCircle.centerPos.y, inaccuracyCircle.radius, Fade(RED, 0.3f));
-        // DrawCircleLines(inaccuracyCircle.centerPos.x, inaccuracyCircle.centerPos.y, inaccuracyCircle.radius, RED);
-
         Rectangle rect = GenerateCellNeighborRect(mousePosCellIdx, selectedUnitComp.selectedAbility->inaccuracyRadius, gameContext->cellWidth, gameContext->cellHeight);
         DrawRectangleRec(rect, Fade(ORANGE, 0.2f));
     }
@@ -263,8 +254,9 @@ void sUseAbilities(GameContext *gameContext)
                 if (!gameContext->registry.all_of<MovePoints>(selectedUnitEntity))
                 {
                     gameContext->registry.emplace<MovePoints>(selectedUnitEntity, bresenhamCells);
-                    std::cout << selectedUnitComp.supplies << " " << currMoveCost << std::endl;
+                    std::cout << "Supplies before move: " << " " << selectedUnitComp.supplies << " " << currMoveCost << std::endl;
                     selectedUnitComp.supplies -= currMoveCost;
+                    std::cout << "Supplies after move: " << " " << selectedUnitComp.supplies << " " << currMoveCost << std::endl;
                 }
             }
         }
