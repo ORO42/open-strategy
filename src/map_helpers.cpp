@@ -198,19 +198,23 @@ int GetTotalHeightForCellIdx(GameContext *gameContext, const Vector2i &cellIdx)
         return 0;
     }
 
-    int finalHeight;
+    if (gameContext->allUnits.find(cellIdx) != gameContext->allUnits.end())
+    {
+        entt::entity unitEntity = gameContext->allUnits[cellIdx];
+        auto &unitcomp = gameContext->registry.get<Unit>(unitEntity);
 
-    // if (gameContext->allObstacles.find(cellIdx) != gameContext->allObstacles.end())
-    // {
-    //     entt::entity obstacleEntity = gameContext->allObstacles[cellIdx];
-    //     auto &obstacleComp = gameContext->registry.get<Obstacle>(obstacleEntity);
-    // }
+        return GetTotalHeightOfUnitForCellIdx(gameContext, cellIdx);
+    }
+    else
+    {
+        if (gameContext->allObstacles.find(cellIdx) != gameContext->allObstacles.end())
+        {
+            entt::entity obstacleEntity = gameContext->allObstacles[cellIdx];
+            auto &obstacleComp = gameContext->registry.get<Obstacle>(obstacleEntity);
 
-    // if (gameContext->allUnits.find(cellIdx) != gameContext->allUnits.end())
-    // {
-    //     entt::entity unitEntity = gameContext->allUnits[cellIdx];
-    //     auto &unitcomp = gameContext->registry.get<Obstacle>(unitEntity);
-    // }
+            return GetTotalHeightIncludingTopMostObstacleExcludingUnitForCellIdx(gameContext, cellIdx);
+        }
+    }
 
     return GetTotalHeightOfUnitForCellIdx(gameContext, cellIdx) + GetTotalHeightIncludingTopMostObstacleExcludingUnitForCellIdx(gameContext, cellIdx);
 }
