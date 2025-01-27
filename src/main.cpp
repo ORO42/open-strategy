@@ -51,6 +51,7 @@ int main()
 		sDrawHoveredCellInfo(&gameContext);
 		sDrawNextTurnTip(&gameContext);
 		sDrawSelectedUnitAbilities(&gameContext);
+		DrawFPS(gameContext.screenWidth / 2, gameContext.screenHeight / 2);
 
 		// end the frame and get ready for the next one  (display frame, poll input, etc...)
 		EndDrawing();
