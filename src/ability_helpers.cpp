@@ -272,25 +272,3 @@ void sUseAbilities(GameContext *gameContext)
         }
     }
 }
-
-// bool AnalyzeMovePath(GameContext *gameContext, const Vector2i &startCellIdx, const std::vector<Vector2i> &path)
-// {
-//     const CellSummary startCellSummary = GetCellSummary(gameContext, startCellIdx);
-//     for (int i = 0; i < path.size(); i++)
-//     {
-//         const Vector2i &cellIdx = path[i];
-//         const CellSummary cellSummary = GetCellSummary(gameContext, cellIdx);
-
-//         // Check height delta
-//         if (startCellSummary.totalHeight <= cellSummary.totalHeight)
-//     }
-// }
-
-bool AnalyzePath(GameContext *gameContext, const Vector2i &startCellIdx, const std::vector<Vector2i> &path)
-{
-    // must check vision, height difference (steepness), cannot move onto a cliff or wall, but can move over one
-}
-
-bool AnalyzeAOE(GameContext *gameContext, const Vector2i &centerCellIdx, const std::vector<Vector2i> &cells)
-{
-}
