@@ -10,6 +10,8 @@
 
 int main()
 {
+	std::srand(std::time(0));
+
 	GameContext gameContext;
 
 	// Tell the window to use vsync and work on high DPI displays
@@ -46,6 +48,7 @@ int main()
 		sDrawSelectedUnitIndicator(&gameContext);
 		sDrawHoveredCellIndicator(&gameContext);
 		sUseAbilities(&gameContext);
+		sDrawPopupText(&gameContext);
 		sDrawPlayerDetails(&gameContext);
 		sDrawUnitDetails(&gameContext);
 		sDrawHoveredCellInfo(&gameContext);

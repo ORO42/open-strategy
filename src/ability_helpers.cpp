@@ -2,6 +2,7 @@
 #include "map_helpers.h"
 #include "math_helpers.h"
 #include "unit_helpers.h"
+#include "ui_helpers.h"
 
 void sCycleSelectedAbility(GameContext *gameContext)
 {
@@ -159,6 +160,8 @@ void sUseAbilities(GameContext *gameContext)
     Vector2i finalCellIdx = mousePosCellIdx;
     Vector2 finalCenter = mouseRectCenter;
     float accuracyP = 1.0;
+    bool didAccRollSucceed = true;
+    // TODO: create "miss" popup at desired target if acc roll fails
     if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
     {
         if (selectedUnitComp.selectedAbility->inaccuracyRadius > 0)
@@ -168,6 +171,7 @@ void sUseAbilities(GameContext *gameContext)
             accuracyP -= chebDist * selectedUnitComp.selectedAbility->accuracyFalloff;
             if (!Chance(accuracyP))
             {
+                didAccRollSucceed = false;
                 Vector2i randomCellIdx = GetRandomItemFromVector(cellsInInaccuracyRadius);
                 finalCellIdx = randomCellIdx;
                 Vector2 finalCellIdxToWorld = MapToWorld(randomCellIdx, gameContext->cellWidth, gameContext->cellHeight);
@@ -209,15 +213,13 @@ void sUseAbilities(GameContext *gameContext)
         }
     }
 
-    if (selectedUnitComp.selectedAbility->firesProjectile)
-    {
-        if (selectedUnitComp.selectedAbility->isAerialProjectile)
-        {
-        }
-        else
-        {
-        }
-    }
+    // if (selectedUnitComp.selectedAbility->firesProjectile)
+    // {
+    //     if (!selectedUnitComp.selectedAbility->isAerialProjectile)
+    //     {
+    //         // If prev acc roll failed, choose a random
+    //     }
+    // }
 
     if (selectedUnitComp.selectedAbility->range > 0)
     {
@@ -269,6 +271,46 @@ void sUseAbilities(GameContext *gameContext)
                 visionTrapEntity->facingAngle = GetAngleBetweenPoints(selectedUnitCenter, mouseRectCenter);
                 PositionAllTrapezoids(gameContext);
             }
+        }
+        if (selectedUnitComp.selectedAbility->firesProjectile && !selectedUnitComp.selectedAbility->isAerialProjectile)
+        {
+            CellSummary targetCellSummary = GetCellSummary(gameContext, finalCellIdx);
+
+            bool damagedObstacle = false;
+
+            if (targetCellSummary.obstacle != entt::null)
+            {
+                auto &obstacleComp = gameContext->registry.get<Obstacle>(targetCellSummary.obstacle);
+
+                if (obstacleComp.isDestructible)
+                {
+                    int obstacleDamage = selectedUnitComp.selectedAbility->terrainDamageMin + std::rand() % (selectedUnitComp.selectedAbility->terrainDamageMax - selectedUnitComp.selectedAbility->terrainDamageMin + 1);
+                    obstacleComp.currentHealth -= obstacleDamage;
+                    damagedObstacle = true;
+                    CreatePopupText(gameContext, std::to_string(obstacleDamage), MapToWorld(obstacleComp.cellIdx, gameContext->cellWidth, gameContext->cellHeight), LIGHTGRAY, false, std::chrono::seconds(1));
+                }
+            }
+            if (targetCellSummary.unit != entt::null)
+            {
+                auto &unitComp = gameContext->registry.get<Unit>(targetCellSummary.unit);
+                int finalUnitDamage;
+
+                if (unitComp.isPerson)
+                {
+                    finalUnitDamage = selectedUnitComp.selectedAbility->fleshDamageMin + std::rand() % (selectedUnitComp.selectedAbility->fleshDamageMax - selectedUnitComp.selectedAbility->fleshDamageMin + 1);
+                }
+
+                if (unitComp.isStructure || unitComp.isVehicle)
+                {
+                    finalUnitDamage = selectedUnitComp.selectedAbility->armorDamageMin + std::rand() % (selectedUnitComp.selectedAbility->armorDamageMax - selectedUnitComp.selectedAbility->armorDamageMin + 1);
+                }
+
+                unitComp.currentHealth -= finalUnitDamage;
+
+                CreatePopupText(gameContext, std::to_string(finalUnitDamage), MapToWorld(unitComp.cellIdx, gameContext->cellWidth, gameContext->cellHeight), GREEN, false, std::chrono::seconds(1));
+            }
+
+            // TODO: handle AOE
         }
     }
 }

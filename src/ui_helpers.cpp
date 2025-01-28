@@ -405,3 +405,49 @@ void sDrawTargetingDetails(GameContext *gameContext)
 {
     // Distance, terrain level diff, height diff, is vision blocked,
 }
+
+void CreatePopupText(GameContext *gameContext, std::string text, Vector2 position, Color color, bool useFade, std::chrono::duration<double> maxDuration)
+{
+    PopupText newPopupText;
+    newPopupText.text = text;
+    newPopupText.position = position;
+    newPopupText.color = color;
+    newPopupText.useFade = useFade;
+    newPopupText.maxDuration = maxDuration;
+    newPopupText.startTime = std::chrono::steady_clock::now();
+
+    entt::entity popupTextEntity = gameContext->registry.create();
+    gameContext->registry.emplace<PopupText>(popupTextEntity, newPopupText);
+}
+
+void sDrawPopupText(GameContext *gameContext)
+{
+    auto view = gameContext->registry.view<PopupText>();
+    for (auto entity : view)
+    {
+        PopupText &popupTextComp = view.get<PopupText>(entity);
+
+        // Calculate elapsed time
+        auto now = std::chrono::steady_clock::now();
+        auto elapsedTime = now - popupTextComp.startTime;
+
+        // TODO: fade logic exhibiting undefined behavior
+        // Determine remaining fade factor (1.0 -> fully visible, 0.0 -> fully faded)
+        float fadeFactor = 1.0f;
+        if (popupTextComp.useFade && elapsedTime < popupTextComp.maxDuration)
+        {
+            fadeFactor = 1.0f - static_cast<float>(elapsedTime.count()) / static_cast<float>(popupTextComp.maxDuration.count());
+        }
+
+        // Draw the text
+        BeginMode2D(gameContext->camera);
+        DrawText(popupTextComp.text.c_str(), static_cast<int>(popupTextComp.position.x), static_cast<int>(popupTextComp.position.y), 20, popupTextComp.useFade ? Fade(popupTextComp.color, 1.0f * fadeFactor) : popupTextComp.color);
+        EndMode2D();
+
+        // Remove the entity if its fade duration has expired
+        if (elapsedTime >= popupTextComp.maxDuration)
+        {
+            gameContext->registry.destroy(entity);
+        }
+    }
+}
