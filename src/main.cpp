@@ -33,6 +33,28 @@ int main()
 	// game loop
 	while (!WindowShouldClose()) // run the loop untill the user presses ESCAPE or presses the Close button on the window
 	{
+		ENetEvent event;
+		while (enet_host_service(enetHost, &event, 0) > 0) // Non-blocking
+		{
+			switch (event.type)
+			{
+				// case ENET_EVENT_TYPE_CONNECT:
+				// 	printf("connected to server----");
+
+			case ENET_EVENT_TYPE_RECEIVE:
+				printf("Received: %s\n", (char *)event.packet->data);
+				enet_packet_destroy(event.packet);
+				break;
+
+			case ENET_EVENT_TYPE_DISCONNECT:
+				printf("Disconnected from server.\n");
+				break;
+
+			default:
+				break;
+			}
+		}
+
 		// update
 		sCameraKeyInput(&gameContext);
 		sUnitSelection(&gameContext);
@@ -63,6 +85,15 @@ int main()
 		EndDrawing();
 
 		sDestroyGameObjects(&gameContext);
+
+		// if (SendENetMessage(enetPeer, "hello"))
+		// {
+		// 	printf("Message sent successfully.\n");
+		// }
+		// else
+		// {
+		// 	printf("Failed to send message.\n");
+		// }
 	}
 
 	// cleanup

@@ -71,3 +71,31 @@ void CleanupEnetHost(ENetHost *host)
         fprintf(stderr, "ENet host destroyed.\n");
     }
 }
+
+bool SendENetMessage(ENetPeer *peer, const std::string &message, enet_uint8 channelID, ENetPacketFlag flags)
+{
+    if (peer == nullptr)
+    {
+        printf("Error: Peer is null.\n");
+        return false;
+    }
+
+    // Create a packet with the message data
+    ENetPacket *packet = enet_packet_create(message.c_str(), message.size() + 1, flags);
+
+    if (packet == nullptr)
+    {
+        printf("Error: Failed to create packet.\n");
+        return false;
+    }
+
+    // Send the packet to the peer on the specified channel
+    if (enet_peer_send(peer, channelID, packet) < 0)
+    {
+        printf("Error: Failed to send packet.\n");
+        enet_packet_destroy(packet); // Clean up the packet if sending fails
+        return false;
+    }
+
+    return true;
+}
