@@ -156,11 +156,16 @@ void sUseAbilities(GameContext *gameContext)
         }
     }
 
-    // Handle inaccuracyRadius
+    // Handle accuracy roll and inaccuracyRadius
     Vector2i finalCellIdx = mousePosCellIdx;
     Vector2 finalCenter = mouseRectCenter;
     float accuracyP = 1.0;
+    accuracyP -= chebDist * selectedUnitComp.selectedAbility->accuracyFalloff;
     bool didAccRollSucceed = true;
+    if (!Chance(accuracyP))
+    {
+        didAccRollSucceed = false;
+    }
     // TODO: create "miss" popup at desired target if acc roll fails
     if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
     {
@@ -168,8 +173,7 @@ void sUseAbilities(GameContext *gameContext)
         {
             Rectangle rect = GenerateCellNeighborRect(selectedUnitComp.cellIdx, selectedUnitComp.selectedAbility->inaccuracyRadius, gameContext->cellWidth, gameContext->cellHeight);
             std::vector<Vector2i> cellsInInaccuracyRadius = DeduceCellIdxsOverlappingRect(rect, gameContext->cellWidth, gameContext->cellHeight);
-            accuracyP -= chebDist * selectedUnitComp.selectedAbility->accuracyFalloff;
-            if (!Chance(accuracyP))
+            if (!didAccRollSucceed)
             {
                 didAccRollSucceed = false;
                 Vector2i randomCellIdx = GetRandomItemFromVector(cellsInInaccuracyRadius);
@@ -197,7 +201,7 @@ void sUseAbilities(GameContext *gameContext)
             {
                 auto &obstacleComp = gameContext->registry.get<Obstacle>(cellSummary.obstacle);
             }
-            DrawRectangleRec({static_cast<float>(cell.x) * gameContext->cellWidth, static_cast<float>(cell.y) * gameContext->cellHeight, static_cast<float>(gameContext->cellWidth), static_cast<float>(gameContext->cellHeight)}, Fade(BLUE, 0.2f));
+            // DrawRectangleRec({static_cast<float>(cell.x) * gameContext->cellWidth, static_cast<float>(cell.y) * gameContext->cellHeight, static_cast<float>(gameContext->cellWidth), static_cast<float>(gameContext->cellHeight)}, Fade(BLUE, 0.2f));
 
             blockingCellIdx = HasElevationLOS(gameContext, 3.28f, selectedUnitComp.cellIdx, mousePosCellIdx, cell);
             if (blockingCellIdx.x != -1 && blockingCellIdx.y != -1)
@@ -207,7 +211,10 @@ void sUseAbilities(GameContext *gameContext)
                 Vector2 finalCellIdxToWorld = MapToWorld(finalCellIdx, gameContext->cellWidth, gameContext->cellHeight);
                 finalCenter = GetRectCenter(Rectangle{finalCellIdxToWorld.x, finalCellIdxToWorld.y, static_cast<float>(gameContext->cellWidth), static_cast<float>(gameContext->cellHeight)});
                 Circle blockingIndicator = GenerateGridBoundCircle(finalCenter, 0, gameContext->cellWidth, gameContext->cellHeight);
-                DrawCircle(blockingIndicator.centerPos.x, blockingIndicator.centerPos.y, blockingIndicator.radius, BLACK);
+                if (blockingCellIdx.x != mousePosCellIdx.x && blockingCellIdx.y != mousePosCellIdx.y)
+                {
+                    // DrawCircle(blockingIndicator.centerPos.x, blockingIndicator.centerPos.y, blockingIndicator.radius, BLACK);
+                }
                 break;
             }
         }
@@ -274,6 +281,13 @@ void sUseAbilities(GameContext *gameContext)
         }
         if (selectedUnitComp.selectedAbility->firesProjectile && !selectedUnitComp.selectedAbility->isAerialProjectile)
         {
+            // If accuracy failed, choose a random cell from the cells in the line
+            // if (!didAccRollSucceed)
+            // {
+            //     std::cout << "miss" << std::endl;
+            //     // TODO: may need to pop back
+            //     finalCellIdx = GetRandomItemFromVector(straightLineCells);
+            // }
             CellSummary targetCellSummary = GetCellSummary(gameContext, finalCellIdx);
 
             bool damagedObstacle = false;
