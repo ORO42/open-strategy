@@ -55,7 +55,11 @@ void sDrawGameTextures(GameContext *gameContext)
                 worldPosition.y,
                 static_cast<float>(gameContext->cellWidth),
                 static_cast<float>(gameContext->cellHeight)};
-            DrawTexturePro(gameContext->allTextures[spriteSheetName], sourceRect, destRect, {0.0f, 0.0f}, 0.0f, WHITE);
+
+            if (gameContext->registry.all_of<IsVisible>(unitEntity))
+            {
+                DrawTexturePro(gameContext->allTextures[spriteSheetName], sourceRect, destRect, {0.0f, 0.0f}, 0.0f, WHITE);
+            }
         }
     }
 

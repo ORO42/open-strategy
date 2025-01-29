@@ -6,3 +6,4 @@ void CreateUnit(GameContext *gameContext, const std::string &type, const Vector2
 void sUnitSelection(GameContext *gameContext);
 void sMoveUnits(GameContext *gameContext);
 void PositionAllTrapezoids(GameContext *gameContext);
+void ComputeMyTeamsVision(GameContext *gameContext);

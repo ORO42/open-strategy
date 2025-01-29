@@ -312,5 +312,6 @@ void sUseAbilities(GameContext *gameContext)
 
             // TODO: handle AOE
         }
+        ComputeMyTeamsVision(gameContext);
     }
 }

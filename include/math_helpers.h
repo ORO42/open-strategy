@@ -24,6 +24,11 @@ BoundingBox CreateGridCellBoundingBox(float x, float y, float width, float heigh
 Vector3 MyVector3Normalize(Vector3 v);
 Vector3 MyVector3Subtract(Vector3 v1, Vector3 v2);
 
+float ProjectPointOntoAxis(const Vector2 &point, const Vector2 &axis);
+bool Overlaps(float min1, float max1, float min2, float max2);
+Vector2 GenerateAxis(const Vector2 &p1, const Vector2 &p2);
+bool CheckCollisionTrapezoidRectangle(const IsoscelesTrapezoid &trapezoid, const Rectangle &rectangle);
+
 template <typename T>
 T GetRandomItemFromVector(const std::vector<T> &vec)
 {

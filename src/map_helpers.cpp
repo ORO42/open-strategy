@@ -73,6 +73,7 @@ void Startup(GameContext *gameContext)
         std::cout << "Creating new game" << std::endl;
         BuildMap(gameContext);
         CreateUnit(gameContext, "rifleman", {2, 2}, Teams::TEAM_BLUE);
+        CreateUnit(gameContext, "rifleman", {4, 2}, Teams::TEAM_RED);
         return;
     }
     if (configLoadSave.size() > 0)

@@ -302,3 +302,80 @@ Vector3 MyVector3Subtract(Vector3 v1, Vector3 v2)
 
     return result;
 }
+
+// Project a point onto an axis
+float ProjectPointOntoAxis(const Vector2 &point, const Vector2 &axis)
+{
+    return (point.x * axis.x + point.y * axis.y) / sqrt(axis.x * axis.x + axis.y * axis.y);
+}
+
+// Check if projections overlap
+bool Overlaps(float min1, float max1, float min2, float max2)
+{
+    return !(min1 > max2 || min2 > max1);
+}
+
+// Generate axis from two points
+Vector2 GenerateAxis(const Vector2 &p1, const Vector2 &p2)
+{
+    Vector2 edge = {p2.x - p1.x, p2.y - p1.y};
+    return {-edge.y, edge.x}; // Perpendicular axis
+}
+
+// Collision detection between trapezoid and rectangle
+bool CheckCollisionTrapezoidRectangle(const IsoscelesTrapezoid &trapezoid, const Rectangle &rectangle)
+{
+    // Trapezoid vertices
+    Vector2 trapezoidVertices[4] = {trapezoid.p1, trapezoid.p2, trapezoid.p3, trapezoid.p4};
+
+    // Rectangle vertices
+    Vector2 rectangleVertices[4] = {
+        {rectangle.x, rectangle.y},
+        {rectangle.x + rectangle.width, rectangle.y},
+        {rectangle.x + rectangle.width, rectangle.y + rectangle.height},
+        {rectangle.x, rectangle.y + rectangle.height}};
+
+    // Collect axes from trapezoid edges
+    Vector2 axes[8];
+    for (int i = 0; i < 4; ++i)
+    {
+        axes[i] = GenerateAxis(trapezoidVertices[i], trapezoidVertices[(i + 1) % 4]);
+    }
+
+    // Collect axes from rectangle edges
+    for (int i = 0; i < 4; ++i)
+    {
+        axes[i + 4] = GenerateAxis(rectangleVertices[i], rectangleVertices[(i + 1) % 4]);
+    }
+
+    // Project trapezoid and rectangle onto each axis
+    for (const auto &axis : axes)
+    {
+        float minTrapezoid = INFINITY, maxTrapezoid = -INFINITY;
+        float minRectangle = INFINITY, maxRectangle = -INFINITY;
+
+        // Project trapezoid
+        for (const auto &vertex : trapezoidVertices)
+        {
+            float projection = ProjectPointOntoAxis(vertex, axis);
+            minTrapezoid = std::min(minTrapezoid, projection);
+            maxTrapezoid = std::max(maxTrapezoid, projection);
+        }
+
+        // Project rectangle
+        for (const auto &vertex : rectangleVertices)
+        {
+            float projection = ProjectPointOntoAxis(vertex, axis);
+            minRectangle = std::min(minRectangle, projection);
+            maxRectangle = std::max(maxRectangle, projection);
+        }
+
+        // Check for separation
+        if (!Overlaps(minTrapezoid, maxTrapezoid, minRectangle, maxRectangle))
+        {
+            return false; // Separating axis found, no collision
+        }
+    }
+
+    return true; // No separating axis found, collision detected
+}

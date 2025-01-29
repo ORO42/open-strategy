@@ -99,6 +99,7 @@ struct Unit
     std::vector<Ability> abilities;
     int selectedAbilityIdx = -1;
     Ability *selectedAbility = nullptr;
+    Teams team;
 };
 
 struct MovePoints
