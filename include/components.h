@@ -175,3 +175,9 @@ struct IsoscelesTrapezoid
     Vector2 p3;        // top right
     Vector2 p4;        // top left
 };
+
+struct ScrollPanel
+{
+    Rectangle rect;
+    std::vector<std::vector<std::string>> items;
+};
