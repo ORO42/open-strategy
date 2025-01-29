@@ -407,7 +407,29 @@ void sDrawIndicatorLine(GameContext *gameContext)
 
 void sDrawTargetingDetails(GameContext *gameContext)
 {
-    // Distance, terrain level diff, height diff, is vision blocked,
+    // Distance, terrain level diff, height diff
+    int rightMargin = 10;
+    int topMargin = 10;
+
+    if (gameContext->selectedUnit == entt::null || !CheckMouseInMapBounds(gameContext))
+    {
+        return;
+    }
+
+    Vector2 mousePosScreen = GetMousePosition();
+    Vector2 mousePosWorld = GetScreenToWorld2D(mousePosScreen, gameContext->camera);
+    Vector2i mousePosCellIdx = WorldToMap(mousePosWorld, gameContext->cellWidth, gameContext->cellHeight);
+    Vector2 mouseRectCellIdxToWorld = MapToWorld(mousePosCellIdx, gameContext->cellWidth, gameContext->cellHeight);
+
+    auto &unitComp = gameContext->registry.get<Unit>(gameContext->selectedUnit);
+    int chebDist = GetChebyshevDistance(unitComp.cellIdx, mousePosCellIdx);
+
+    std::string distanceText = "Distance: " + std::to_string(chebDist);
+    int textWidth = MeasureText(distanceText.c_str(), gameContext->baseFontSize);
+    int posX = gameContext->screenWidth - textWidth - rightMargin;
+    int posY = topMargin;
+
+    DrawText(distanceText.c_str(), posX, posY, gameContext->baseFontSize, WHITE);
 }
 
 void CreatePopupText(GameContext *gameContext, std::string text, Vector2 position, Color color, bool useFade, std::chrono::duration<double> maxDuration)

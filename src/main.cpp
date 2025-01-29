@@ -54,6 +54,7 @@ int main()
 		sDrawPlayerDetails(&gameContext);
 		sDrawUnitDetails(&gameContext);
 		sDrawHoveredCellInfo(&gameContext);
+		sDrawTargetingDetails(&gameContext);
 		sDrawNextTurnTip(&gameContext);
 		sDrawSelectedUnitAbilities(&gameContext);
 		DrawFPS(gameContext.screenWidth / 2, gameContext.screenHeight / 2);
