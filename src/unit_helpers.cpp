@@ -232,6 +232,15 @@ void ComputeMyTeamsVision(GameContext *gameContext)
     auto teamBlueView = gameContext->registry.view<Unit, IsoscelesTrapezoid, TeamBlue>();
     auto teamRedView = gameContext->registry.view<Unit, IsoscelesTrapezoid, TeamRed>();
 
+    // First, remove visbility for all other team units
+    for (auto &entity : teamRedView)
+    {
+        if (gameContext->registry.all_of<IsVisible>(entity))
+        {
+            gameContext->registry.remove<IsVisible>(entity);
+        }
+    }
+
     if (gameContext->myPlayer.team == Teams::TEAM_BLUE)
     {
         for (auto &entity : teamBlueView)

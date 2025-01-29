@@ -5,6 +5,8 @@
 #include "camera_helpers.h"
 #include "unit_helpers.h"
 #include "ability_helpers.h"
+#include "networking_helpers.h"
+#include "destruction_helpers.h"
 
 #include "resource_dir.h" // utility header for SearchAndSetResourceDir
 
@@ -58,11 +60,16 @@ int main()
 
 		// end the frame and get ready for the next one  (display frame, poll input, etc...)
 		EndDrawing();
+
+		sDestroyGameObjects(&gameContext);
 	}
 
 	// cleanup
 	// unload our texture so it can be cleaned up
 	gameContext.UnloadAllTextures();
+
+	// cleanup enet host
+	CleanupEnetHost(enetHost);
 
 	// destroy the window and cleanup the OpenGL context
 	CloseWindow();

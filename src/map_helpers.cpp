@@ -3,6 +3,7 @@
 #include "math_helpers.h"
 #include "obstacle_helpers.h"
 #include "unit_helpers.h"
+#include "networking_helpers.h"
 
 void BuildMap(GameContext *gameContext)
 {
@@ -71,6 +72,20 @@ void Startup(GameContext *gameContext)
     if (configSelectedMap.size() > 0)
     {
         std::cout << "Creating new game" << std::endl;
+
+        // Initialize ENet
+        InitEnet();
+
+        // Create a host (server)
+        enetHost = CreateEnetHost(12345, 2, 2);
+
+        // Connect my peer
+        enetPeer = ConnectToEnetPeer(enetHost, "127.0.0.1", 12345, 2);
+        if (enetPeer == NULL)
+        {
+            CleanupEnetHost(enetHost);
+        }
+
         BuildMap(gameContext);
         CreateUnit(gameContext, "rifleman", {2, 2}, Teams::TEAM_BLUE);
         CreateUnit(gameContext, "rifleman", {4, 2}, Teams::TEAM_RED);
