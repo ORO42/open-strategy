@@ -83,22 +83,54 @@ void Startup(GameContext *gameContext)
         enetPeer = ConnectToEnetPeer(enetHost, "127.0.0.1", 12345, 2);
         if (enetPeer == NULL)
         {
+            std::cout << "Host failed to connect" << std::endl;
             CleanupEnetHost(enetHost);
         }
 
         BuildMap(gameContext);
         CreateUnit(gameContext, "rifleman", {2, 2}, Teams::TEAM_BLUE);
         CreateUnit(gameContext, "rifleman", {4, 2}, Teams::TEAM_RED);
+
         return;
     }
+
     if (configLoadSave.size() > 0)
     {
         std::cout << "Loading new game" << std::endl;
         return;
     }
+
     if (configConnectTo.size() > 0)
     {
         std::cout << "Connecting to networked game" << std::endl;
+        // Initialize ENet
+        InitEnet();
+
+        // Create a client host (connect to another player)
+        enetHost = CreateEnetHost(0, 1, 2); // 0 means don't need to listen
+
+        // Connect to the provided IP
+        enetPeer = ConnectToEnetPeer(enetHost, configConnectTo.c_str(), 12345, 2);
+        if (!enetPeer)
+        {
+            std::cerr << "Failed to connect to " << configConnectTo << "\n";
+            CleanupEnetHost(enetHost);
+            return;
+        }
+
+        // Wait for connection event (this is a blocking call until it connects)
+        ENetEvent event;
+        if (enet_host_service(enetHost, &event, 5000) > 0 && event.type == ENET_EVENT_TYPE_CONNECT)
+        {
+            std::cout << "Successfully connected to " << configConnectTo << "\n";
+        }
+        else
+        {
+            std::cerr << "Connection to " << configConnectTo << " failed.\n";
+            enet_peer_reset(enetPeer);
+            CleanupEnetHost(enetHost);
+            return;
+        }
         return;
     }
     std::cout << "All game setup config options are empty. Aborting game startup." << std::endl;

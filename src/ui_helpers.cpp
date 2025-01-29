@@ -187,6 +187,10 @@ void sDrawUnitDetails(GameContext *gameContext)
     if (gameContext->allUnits.find(mousePosCellIdx) != gameContext->allUnits.end())
     {
         entt::entity hoveredUnit = gameContext->allUnits[mousePosCellIdx];
+        if (!gameContext->registry.all_of<IsVisible>(hoveredUnit))
+        {
+            return;
+        }
         auto &hoveredUnitComp = gameContext->registry.get<Unit>(hoveredUnit);
 
         std::vector<std::string> hoveredUnitStrings;
@@ -274,11 +278,18 @@ void sDrawHoveredCellInfo(GameContext *gameContext)
     {
         cellInfo += "Total obstacle elev: " + std::to_string(cellSummary.totalHeightIncludingTopMostObstacleExcludingUnit) + "ft; ";
     }
-    if (gameContext->allUnits.find(mousePosCellIdx) != gameContext->allUnits.end())
+    if (gameContext->allUnits.find(mousePosCellIdx) != gameContext->allUnits.end() && cellSummary.unit != entt::null && gameContext->registry.all_of<IsVisible>(cellSummary.unit))
     {
         cellInfo += "Total unit elev: " + std::to_string(cellSummary.totalHeightofUnit) + "ft; ";
     }
-    cellInfo += "Total elev " + std::to_string(cellSummary.totalHeightForCellIdx) + "ft; ";
+    if (cellSummary.unit != entt::null && gameContext->registry.all_of<IsVisible>(cellSummary.unit))
+    {
+        cellInfo += "Total elev " + std::to_string(cellSummary.totalHeightForCellIdx) + "ft; ";
+    }
+    else
+    {
+        cellInfo += "Total elev " + std::to_string(cellSummary.totalHeightForCellIdx - cellSummary.unitIntrinsicHeight) + "ft; ";
+    }
     if (cellSummary.obstacle != entt::null)
     {
         auto &obstacleComp = gameContext->registry.get<Obstacle>(cellSummary.obstacle);
