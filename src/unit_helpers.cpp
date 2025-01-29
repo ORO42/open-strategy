@@ -227,13 +227,14 @@ void PositionAllTrapezoids(GameContext *gameContext)
     }
 }
 
-void ComputeMyTeamsVision(GameContext *gameContext)
+template <typename MyTeamComponent, typename EnemyTeamComponent>
+void ComputeTeamVision(GameContext *gameContext)
 {
-    auto teamBlueView = gameContext->registry.view<Unit, IsoscelesTrapezoid, TeamBlue>();
-    auto teamRedView = gameContext->registry.view<Unit, IsoscelesTrapezoid, TeamRed>();
+    auto myTeamView = gameContext->registry.view<Unit, IsoscelesTrapezoid, MyTeamComponent>();
+    auto enemyView = gameContext->registry.view<Unit, IsoscelesTrapezoid, EnemyTeamComponent>();
 
-    // First, remove visbility for all other team units
-    for (auto &entity : teamRedView)
+    // Remove visibility from all enemies first
+    for (auto entity : enemyView)
     {
         if (gameContext->registry.all_of<IsVisible>(entity))
         {
@@ -241,60 +242,72 @@ void ComputeMyTeamsVision(GameContext *gameContext)
         }
     }
 
-    if (gameContext->myPlayer.team == Teams::TEAM_BLUE)
+    // Check visibility for each unit in my team
+    for (auto entity : myTeamView)
     {
-        for (auto &entity : teamBlueView)
+        const auto &unitComp = gameContext->registry.get<Unit>(entity);
+        const auto &visionTrap = gameContext->registry.get<IsoscelesTrapezoid>(entity);
+
+        Vector2 unitWorldPos = MapToWorld(unitComp.cellIdx, gameContext->cellWidth, gameContext->cellHeight);
+        Rectangle unitRect = {unitWorldPos.x, unitWorldPos.y,
+                              static_cast<float>(gameContext->cellWidth),
+                              static_cast<float>(gameContext->cellHeight)};
+        Vector2 unitCenter = GetRectCenter(unitRect);
+
+        // Check against all enemy units
+        for (auto enemyEntity : enemyView)
         {
-            auto &unitComp = gameContext->registry.get<Unit>(entity);
-            auto &unitVisionTrapComp = gameContext->registry.get<IsoscelesTrapezoid>(entity);
+            const auto &enemyUnit = gameContext->registry.get<Unit>(enemyEntity);
+            Vector2 enemyWorldPos = MapToWorld(enemyUnit.cellIdx, gameContext->cellWidth, gameContext->cellHeight);
+            Rectangle enemyRect = {enemyWorldPos.x, enemyWorldPos.y,
+                                   static_cast<float>(gameContext->cellWidth),
+                                   static_cast<float>(gameContext->cellHeight)};
 
-            Vector2 unitWorldPos = MapToWorld(unitComp.cellIdx, gameContext->cellWidth, gameContext->cellHeight);
-            Rectangle unitRect = Rectangle{unitWorldPos.x, unitWorldPos.y, static_cast<float>(gameContext->cellWidth), static_cast<float>(gameContext->cellHeight)};
-            Vector2 unitCenter = GetRectCenter(unitRect);
-
-            for (auto &entity2 : teamRedView)
+            if (CheckCollisionTrapezoidRectangle(visionTrap, enemyRect))
             {
-                auto &unitComp2 = gameContext->registry.get<Unit>(entity2);
-                auto &unitVisionTrapComp2 = gameContext->registry.get<IsoscelesTrapezoid>(entity2);
+                Vector2 enemyCenter = GetRectCenter(enemyRect);
+                std::vector<Vector2i> lineCells = GetCellsOverlappingLine(unitCenter, enemyCenter,
+                                                                          gameContext->cellWidth,
+                                                                          gameContext->cellHeight);
+                if (!lineCells.empty())
+                    lineCells.erase(lineCells.begin());
 
-                Vector2 unit2WorldPos = MapToWorld(unitComp2.cellIdx, gameContext->cellWidth, gameContext->cellHeight);
-                Rectangle unit2Rect = Rectangle{unit2WorldPos.x, unit2WorldPos.y, static_cast<float>(gameContext->cellWidth), static_cast<float>(gameContext->cellHeight)};
-                Vector2 unit2Center = GetRectCenter(unit2Rect);
-
-                // If my team unit trapezoid overlapping enemy, place IsVisible component on enemy, else remove IsVisible, if enemy has it
-                Vector2i blockingCellIdx = {-1, -1};
-                if (CheckCollisionTrapezoidRectangle(unitVisionTrapComp, unit2Rect))
+                Vector2i blockingCell = {-1, -1};
+                for (const auto &cell : lineCells)
                 {
-                    std::vector<Vector2i> straightLineCells = GetCellsOverlappingLine(unitCenter, unit2Center, gameContext->cellWidth, gameContext->cellHeight);
-                    straightLineCells.erase(straightLineCells.begin()); // Remove the first cell, since we don't count the unit's cell
+                    blockingCell = HasElevationLOS(gameContext, 3.28f, unitComp.cellIdx,
+                                                   enemyUnit.cellIdx, cell);
+                }
 
-                    for (auto &cell : straightLineCells)
+                if ((blockingCell.x == -1 && blockingCell.y == -1) ||
+                    blockingCell == enemyUnit.cellIdx)
+                {
+                    if (!gameContext->registry.all_of<IsVisible>(enemyEntity))
                     {
-                        const CellSummary cellSummary = GetCellSummary(gameContext, cell);
-
-                        blockingCellIdx = HasElevationLOS(gameContext, 3.28f, unitComp.cellIdx, unitComp2.cellIdx, cell);
-                    }
-
-                    if (blockingCellIdx.x == -1 && blockingCellIdx.y == -1 || blockingCellIdx.x == unitComp2.cellIdx.x && blockingCellIdx.y == unitComp2.cellIdx.y)
-                    {
-                        if (!gameContext->registry.all_of<IsVisible>(entity2))
-                        {
-                            gameContext->registry.emplace<IsVisible>(entity2);
-                        }
+                        gameContext->registry.emplace<IsVisible>(enemyEntity);
                     }
                 }
-                else
+            }
+            else
+            {
+                if (gameContext->registry.all_of<IsVisible>(enemyEntity))
                 {
-                    if (gameContext->registry.all_of<IsVisible>(entity2))
-                    {
-                        gameContext->registry.remove<IsVisible>(entity2);
-                    }
+                    gameContext->registry.remove<IsVisible>(enemyEntity);
                 }
             }
         }
     }
+}
 
-    if (gameContext->myPlayer.team == Teams::TEAM_RED)
+void ComputeMyTeamsVision(GameContext *gameContext)
+{
+    switch (gameContext->myPlayer.team)
     {
+    case Teams::TEAM_BLUE:
+        ComputeTeamVision<TeamBlue, TeamRed>(gameContext);
+        break;
+    case Teams::TEAM_RED:
+        ComputeTeamVision<TeamRed, TeamBlue>(gameContext);
+        break;
     }
 }
