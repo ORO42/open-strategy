@@ -2,7 +2,7 @@
 
 #include "game_context.h"
 
-void BuildMap(GameContext *gameContext);
+void BuildMap(GameContext *gameContext, const std::string &mapName);
 void Startup(GameContext *gameContext);
 bool CheckMouseInMapBounds(GameContext *gameContext);
 

@@ -1,6 +1,7 @@
 #include "unit_helpers.h"
 #include "math_helpers.h"
 #include "map_helpers.h"
+#include "networking_helpers.h"
 
 void CreateUnit(GameContext *gameContext, const std::string &type, const Vector2i &cellIdx, const Teams &team)
 {
@@ -173,6 +174,13 @@ void sMoveUnits(GameContext *gameContext)
                 unitComp.cellIdx = cellIdx;
                 gameContext->allUnits[cellIdx] = unitEntity;
             }
+
+            nlohmann::json netMessage = nlohmann::json::object({{"type", MessageTypes::MOVE_UNIT},
+                                                                {"from_team", gameContext->myPlayer.team},
+                                                                {"entity", entity},
+                                                                {"new_cell_idx_x", movePointsComp.moveCellIdxs.front().x},
+                                                                {"new_cell_idx_y", movePointsComp.moveCellIdxs.front().y}});
+            SendENetMessage(enetPeer, netMessage.dump());
 
             // remove the first move cell idx
             movePointsComp.moveCellIdxs.erase(movePointsComp.moveCellIdxs.begin());

@@ -18,6 +18,16 @@ enum struct Stances
     NONE,
 };
 
+enum struct MessageTypes
+{
+    UPDATE_OBSTACLE_HEALTH,
+    UPDATE_UNIT_HEALTH,
+    CREATE_UNIT,
+    CREATE_OBSTACLE,
+    MOVE_UNIT,
+    UPDATE_UNIT_FACING_ANGLE,
+};
+
 struct Player
 {
     std::string name;

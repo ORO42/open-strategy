@@ -3,6 +3,7 @@
 #include "math_helpers.h"
 #include "unit_helpers.h"
 #include "ui_helpers.h"
+#include "networking_helpers.h"
 
 void sCycleSelectedAbility(GameContext *gameContext)
 {
@@ -276,6 +277,11 @@ void sUseAbilities(GameContext *gameContext)
             {
                 auto &visionTrapezoidComp = gameContext->registry.get<IsoscelesTrapezoid>(selectedUnitEntity);
                 visionTrapEntity->facingAngle = GetAngleBetweenPoints(selectedUnitCenter, mouseRectCenter);
+                nlohmann::json netMessage = nlohmann::json::object({{"type", MessageTypes::UPDATE_UNIT_FACING_ANGLE},
+                                                                    {"from_team", gameContext->myPlayer.team},
+                                                                    {"entity", selectedUnitEntity},
+                                                                    {"new_facing_angle", visionTrapezoidComp.facingAngle}});
+                SendENetMessage(enetPeer, netMessage.dump());
                 PositionAllTrapezoids(gameContext);
             }
         }
@@ -300,6 +306,11 @@ void sUseAbilities(GameContext *gameContext)
                 {
                     int obstacleDamage = selectedUnitComp.selectedAbility->terrainDamageMin + std::rand() % (selectedUnitComp.selectedAbility->terrainDamageMax - selectedUnitComp.selectedAbility->terrainDamageMin + 1);
                     obstacleComp.currentHealth -= obstacleDamage;
+                    nlohmann::json netMessage = nlohmann::json::object({{"type", MessageTypes::UPDATE_OBSTACLE_HEALTH},
+                                                                        {"from_team", gameContext->myPlayer.team},
+                                                                        {"entity", targetCellSummary.obstacle},
+                                                                        {"new_health_val", obstacleComp.currentHealth}});
+                    SendENetMessage(enetPeer, netMessage.dump());
                     damagedObstacle = true;
                     CreatePopupText(gameContext, std::to_string(obstacleDamage), MapToWorld(obstacleComp.cellIdx, gameContext->cellWidth, gameContext->cellHeight), LIGHTGRAY, false, std::chrono::seconds(1));
                 }
@@ -320,6 +331,11 @@ void sUseAbilities(GameContext *gameContext)
                 }
 
                 unitComp.currentHealth -= finalUnitDamage;
+                nlohmann::json netMessage = nlohmann::json::object({{"type", MessageTypes::UPDATE_UNIT_HEALTH},
+                                                                    {"from_team", gameContext->myPlayer.team},
+                                                                    {"entity", targetCellSummary.unit},
+                                                                    {"new_health_val", unitComp.currentHealth}});
+                SendENetMessage(enetPeer, netMessage.dump());
 
                 CreatePopupText(gameContext, std::to_string(finalUnitDamage), MapToWorld(unitComp.cellIdx, gameContext->cellWidth, gameContext->cellHeight), GREEN, false, std::chrono::seconds(1));
             }

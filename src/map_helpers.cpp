@@ -5,10 +5,8 @@
 #include "unit_helpers.h"
 #include "networking_helpers.h"
 
-void BuildMap(GameContext *gameContext)
+void BuildMap(GameContext *gameContext, const std::string &mapName)
 {
-    std::string mapName = gameContext->gameSetup["mode_config"]["selected_map"];
-    // nlohmann::json mapData = LoadJsonFromFile("maps/" + mapName + ".json"); TODO use this one once .json is stripped out of incoming mapName
     nlohmann::json mapData = LoadJsonFromFile("maps/" + mapName);
     nlohmann::json cellData = mapData["cell_data"];
 
@@ -85,9 +83,11 @@ void Startup(GameContext *gameContext)
         {
             std::cout << "Host failed to connect" << std::endl;
             CleanupEnetHost(enetHost);
+            return;
         }
-
-        BuildMap(gameContext);
+        std::string mapName = gameContext->gameSetup["mode_config"]["selected_map"];
+        // nlohmann::json mapData = LoadJsonFromFile("maps/" + mapName + ".json"); TODO use this one once .json is stripped out of incoming mapName
+        BuildMap(gameContext, mapName);
         CreateUnit(gameContext, "rifleman", {2, 2}, Teams::TEAM_BLUE);
         CreateUnit(gameContext, "rifleman", {4, 2}, Teams::TEAM_RED);
 
