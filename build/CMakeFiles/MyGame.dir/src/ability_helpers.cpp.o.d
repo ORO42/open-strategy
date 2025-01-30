@@ -3,7 +3,7 @@ CMakeFiles/MyGame.dir/src/ability_helpers.cpp.o: \
   /Users/ollierosen/Desktop/raylib/open-strategy-copy/include/ability_helpers.h \
   /Users/ollierosen/Desktop/raylib/open-strategy-copy/include/game_context.h \
   /Users/ollierosen/Desktop/raylib/open-strategy-copy/include/components.h \
-  /Users/ollierosen/Desktop/raylib/open-strategy-copy/raylib/src/raylib.h \
+  /Users/ollierosen/Desktop/raylib/open-strategy-copy/libs/raylib/src/raylib.h \
   /Library/Developer/CommandLineTools/usr/lib/clang/16/include/stdarg.h \
   /Library/Developer/CommandLineTools/usr/lib/clang/16/include/__stdarg_header_macro.h \
   /Library/Developer/CommandLineTools/usr/lib/clang/16/include/__stdarg___gnuc_va_list.h \

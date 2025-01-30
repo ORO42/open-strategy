@@ -1,6 +1,6 @@
 CMakeFiles/MyGame.dir/src/main.cpp.o: \
   /Users/ollierosen/Desktop/raylib/open-strategy-copy/src/main.cpp \
-  /Users/ollierosen/Desktop/raylib/open-strategy-copy/raylib/src/raylib.h \
+  /Users/ollierosen/Desktop/raylib/open-strategy-copy/libs/raylib/src/raylib.h \
   /Library/Developer/CommandLineTools/usr/lib/clang/16/include/stdarg.h \
   /Library/Developer/CommandLineTools/usr/lib/clang/16/include/__stdarg_header_macro.h \
   /Library/Developer/CommandLineTools/usr/lib/clang/16/include/__stdarg___gnuc_va_list.h \

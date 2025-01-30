@@ -313,7 +313,7 @@ ENABLE_MSAN:BOOL=OFF
 ENABLE_UBSAN:BOOL=OFF
 
 //Value Computed by CMake
-GLFW_BINARY_DIR:STATIC=/Users/ollierosen/Desktop/raylib/open-strategy-copy/build/raylib/raylib/external/glfw
+GLFW_BINARY_DIR:STATIC=/Users/ollierosen/Desktop/raylib/open-strategy-copy/build/libs/raylib/raylib/external/glfw
 
 //Build support for Cocoa
 GLFW_BUILD_COCOA:BOOL=ON
@@ -336,7 +336,7 @@ GLFW_IS_TOP_LEVEL:STATIC=OFF
 GLFW_LIBRARY_TYPE:STRING=OBJECT
 
 //Value Computed by CMake
-GLFW_SOURCE_DIR:STATIC=/Users/ollierosen/Desktop/raylib/open-strategy-copy/raylib/src/external/glfw
+GLFW_SOURCE_DIR:STATIC=/Users/ollierosen/Desktop/raylib/open-strategy-copy/libs/raylib/src/external/glfw
 
 //Include everything disabled by default (for CI usage)
 INCLUDE_EVERYTHING:BOOL=OFF
@@ -366,13 +366,13 @@ USE_EXTERNAL_GLFW:STRING=OFF
 WITH_PIC:BOOL=OFF
 
 //Value Computed by CMake
-raylib_BINARY_DIR:STATIC=/Users/ollierosen/Desktop/raylib/open-strategy-copy/build/raylib/raylib
+raylib_BINARY_DIR:STATIC=/Users/ollierosen/Desktop/raylib/open-strategy-copy/build/libs/raylib/raylib
 
 //Value Computed by CMake
 raylib_IS_TOP_LEVEL:STATIC=OFF
 
 //Value Computed by CMake
-raylib_SOURCE_DIR:STATIC=/Users/ollierosen/Desktop/raylib/open-strategy-copy/raylib/src
+raylib_SOURCE_DIR:STATIC=/Users/ollierosen/Desktop/raylib/open-strategy-copy/libs/raylib/src
 
 
 ########################

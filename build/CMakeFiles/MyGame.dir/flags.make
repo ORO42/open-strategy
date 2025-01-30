@@ -4,7 +4,7 @@
 # compile CXX with /Library/Developer/CommandLineTools/usr/bin/c++
 CXX_DEFINES = -DGRAPHICS_API_OPENGL_33 -DPLATFORM_DESKTOP
 
-CXX_INCLUDES = -I/Users/ollierosen/Desktop/raylib/open-strategy-copy/include -I/Users/ollierosen/Desktop/raylib/open-strategy-copy/raylib/src -I/Users/ollierosen/Desktop/raylib/open-strategy-copy/raylib/src/external/glfw/include
+CXX_INCLUDES = -I/Users/ollierosen/Desktop/raylib/open-strategy-copy/include -I/Users/ollierosen/Desktop/raylib/open-strategy-copy/libs/asio/asio/include -I/Users/ollierosen/Desktop/raylib/open-strategy-copy/libs/raylib/src -I/Users/ollierosen/Desktop/raylib/open-strategy-copy/libs/raylib/src/external/glfw/include
 
 CXX_FLAGSarm64 = -std=gnu++17 -arch arm64 -isysroot /Library/Developer/CommandLineTools/SDKs/MacOSX15.2.sdk -mmacosx-version-min=15.1
 
