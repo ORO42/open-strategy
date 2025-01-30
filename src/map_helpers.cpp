@@ -3,7 +3,6 @@
 #include "math_helpers.h"
 #include "obstacle_helpers.h"
 #include "unit_helpers.h"
-#include "networking_helpers.h"
 
 void BuildMap(GameContext *gameContext, const std::string &mapName)
 {
@@ -71,20 +70,6 @@ void Startup(GameContext *gameContext)
     {
         std::cout << "Creating new game" << std::endl;
 
-        // Initialize ENet
-        InitEnet();
-
-        // Create a host (server)
-        enetHost = CreateEnetHost(12345, 2, 2);
-
-        // Connect my peer
-        enetPeer = ConnectToEnetPeer(enetHost, "127.0.0.1", 12345, 2);
-        if (enetPeer == NULL)
-        {
-            std::cout << "Host failed to connect" << std::endl;
-            CleanupEnetHost(enetHost);
-            return;
-        }
         std::string mapName = gameContext->gameSetup["mode_config"]["selected_map"];
         // nlohmann::json mapData = LoadJsonFromFile("maps/" + mapName + ".json"); TODO use this one once .json is stripped out of incoming mapName
         BuildMap(gameContext, mapName);
@@ -103,35 +88,6 @@ void Startup(GameContext *gameContext)
     if (configConnectTo.size() > 0)
     {
         std::cout << "Connecting to networked game" << std::endl;
-        // Initialize ENet
-        InitEnet();
-
-        // Create a client host (connect to another player)
-        enetHost = CreateEnetHost(0, 1, 2); // 0 means don't need to listen
-
-        // Connect to the provided IP
-        enetPeer = ConnectToEnetPeer(enetHost, configConnectTo.c_str(), 12345, 2);
-        if (!enetPeer)
-        {
-            std::cerr << "Failed to connect to " << configConnectTo << "\n";
-            CleanupEnetHost(enetHost);
-            return;
-        }
-
-        // Wait for connection event (this is a blocking call until it connects)
-        ENetEvent event;
-        if (enet_host_service(enetHost, &event, 5000) > 0 && event.type == ENET_EVENT_TYPE_CONNECT)
-        {
-            std::cout << "Successfully connected to " << configConnectTo << "\n";
-        }
-        else
-        {
-            std::cerr << "Connection to " << configConnectTo << " failed.\n";
-            enet_peer_reset(enetPeer);
-            CleanupEnetHost(enetHost);
-            return;
-        }
-        return;
     }
     std::cout << "All game setup config options are empty. Aborting game startup." << std::endl;
 }

@@ -3,7 +3,6 @@
 #include "math_helpers.h"
 #include "unit_helpers.h"
 #include "ui_helpers.h"
-#include "networking_helpers.h"
 
 void sCycleSelectedAbility(GameContext *gameContext)
 {
@@ -263,7 +262,6 @@ void sUseAbilities(GameContext *gameContext)
                                                                     {"from_team", gameContext->myPlayer.team},
                                                                     {"entity", selectedUnitEntity},
                                                                     {"new_facing_angle", visionTrapezoidComp.facingAngle}});
-                SendENetMessage(enetPeer, netMessage.dump());
                 PositionAllTrapezoids(gameContext);
             }
         }
@@ -292,7 +290,6 @@ void sUseAbilities(GameContext *gameContext)
                                                                         {"from_team", gameContext->myPlayer.team},
                                                                         {"entity", targetCellSummary.obstacle},
                                                                         {"new_health_val", obstacleComp.currentHealth}});
-                    SendENetMessage(enetPeer, netMessage.dump());
                     damagedObstacle = true;
                     CreatePopupText(gameContext, std::to_string(obstacleDamage), MapToWorld(obstacleComp.cellIdx, gameContext->cellWidth, gameContext->cellHeight), LIGHTGRAY, false, std::chrono::seconds(1));
                 }
@@ -317,7 +314,6 @@ void sUseAbilities(GameContext *gameContext)
                                                                     {"from_team", gameContext->myPlayer.team},
                                                                     {"entity", targetCellSummary.unit},
                                                                     {"new_health_val", unitComp.currentHealth}});
-                SendENetMessage(enetPeer, netMessage.dump());
 
                 CreatePopupText(gameContext, std::to_string(finalUnitDamage), MapToWorld(unitComp.cellIdx, gameContext->cellWidth, gameContext->cellHeight), GREEN, false, std::chrono::seconds(1));
             }
