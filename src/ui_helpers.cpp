@@ -488,3 +488,40 @@ void sDrawPopupText(GameContext *gameContext)
         }
     }
 }
+
+void sDrawAbilityElements(GameContext *gameContext)
+{
+    if (gameContext->selectedUnit != entt::null)
+    {
+        auto &unitComp = gameContext->registry.get<Unit>(gameContext->selectedUnit);
+
+        Vector2 mousePosScreen = GetMousePosition();
+        Vector2 mousePosWorld = GetScreenToWorld2D(mousePosScreen, gameContext->camera);
+        Vector2i mousePosCellIdx = WorldToMap(mousePosWorld, gameContext->cellWidth, gameContext->cellHeight);
+
+        if (!unitComp.selectedAbility)
+        {
+            return;
+        }
+
+        BeginMode2D(gameContext->camera);
+        if (unitComp.selectedAbility->range > 0)
+        {
+            Rectangle rect = GenerateCellNeighborRect(unitComp.cellIdx, unitComp.selectedAbility->range, gameContext->cellWidth, gameContext->cellHeight);
+            DrawRectangleRec(rect, Fade(WHITE, 0.2f));
+        }
+
+        if (unitComp.selectedAbility->aoeSize > 0)
+        {
+            Rectangle rect = GenerateCellNeighborRect(mousePosCellIdx, unitComp.selectedAbility->aoeSize, gameContext->cellWidth, gameContext->cellHeight);
+            DrawRectangleRec(rect, Fade(WHITE, 0.2f));
+        }
+
+        if (unitComp.selectedAbility->inaccuracyRadius > 0)
+        {
+            Rectangle rect = GenerateCellNeighborRect(mousePosCellIdx, unitComp.selectedAbility->inaccuracyRadius, gameContext->cellWidth, gameContext->cellHeight);
+            DrawRectangleRec(rect, Fade(ORANGE, 0.2f));
+        }
+        EndMode2D();
+    }
+}

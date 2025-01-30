@@ -72,6 +72,7 @@ int main()
 		sDrawSelectedUnitIndicator(&gameContext);
 		sDrawHoveredCellIndicator(&gameContext);
 		sUseAbilities(&gameContext);
+		sDrawAbilityElements(&gameContext);
 		sDrawPopupText(&gameContext);
 		sDrawPlayerDetails(&gameContext);
 		sDrawUnitDetails(&gameContext);

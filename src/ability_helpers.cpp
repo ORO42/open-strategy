@@ -228,24 +228,6 @@ void sUseAbilities(GameContext *gameContext)
     //         // If prev acc roll failed, choose a random
     //     }
     // }
-
-    if (selectedUnitComp.selectedAbility->range > 0)
-    {
-        Rectangle rect = GenerateCellNeighborRect(selectedUnitComp.cellIdx, selectedUnitComp.selectedAbility->range, gameContext->cellWidth, gameContext->cellHeight);
-        DrawRectangleRec(rect, Fade(WHITE, 0.2f));
-    }
-
-    if (selectedUnitComp.selectedAbility->aoeSize > 0)
-    {
-        Rectangle rect = GenerateCellNeighborRect(mousePosCellIdx, selectedUnitComp.selectedAbility->aoeSize, gameContext->cellWidth, gameContext->cellHeight);
-        DrawRectangleRec(rect, Fade(WHITE, 0.2f));
-    }
-
-    if (selectedUnitComp.selectedAbility->inaccuracyRadius > 0)
-    {
-        Rectangle rect = GenerateCellNeighborRect(mousePosCellIdx, selectedUnitComp.selectedAbility->inaccuracyRadius, gameContext->cellWidth, gameContext->cellHeight);
-        DrawRectangleRec(rect, Fade(ORANGE, 0.2f));
-    }
     EndMode2D();
 
     if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
